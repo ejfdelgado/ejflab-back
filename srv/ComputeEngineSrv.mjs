@@ -2,7 +2,7 @@ import { General } from "./common/General.mjs";
 import { MyStore } from "./common/MyStore.mjs";
 import { InstancesClient, ZoneOperationsClient } from '@google-cloud/compute'
 import axios from "axios";
-import MyDatesBack from "../srcJs/MyDatesBack.mjs";
+import MyDatesBack from "@ejfdelgado/ejflab-common/src/MyDatesBack.mjs";
 
 const projectId = "ejfexperiments";
 export const instancesMap = {

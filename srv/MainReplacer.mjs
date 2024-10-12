@@ -1,5 +1,5 @@
-import { MyConstants } from "../srcJs/MyConstants.js";
-import { MyUtilities } from "../srcJs/MyUtilities.js"
+import { MyConstants } from "@ejfdelgado/ejflab-common/src/MyConstants.js";
+import { MyUtilities } from "@ejfdelgado/ejflab-common/src/MyUtilities.js"
 
 export class MainReplacer {
     static replace(rta, replaces, theUrl) {

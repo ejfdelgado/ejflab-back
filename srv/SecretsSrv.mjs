@@ -1,5 +1,5 @@
-import { MyRoutes } from "../srcJs/MyRoutes.js";
-import { ModuloDatoSeguroBack } from "../srcJs/ModuloDatoSeguroBack.mjs";
+import { MyRoutes } from "@ejfdelgado/ejflab-common/src/MyRoutes.js";
+import { ModuloDatoSeguroBack } from "@ejfdelgado/ejflab-common/src/ModuloDatoSeguroBack.mjs";
 import { General } from "./common/General.mjs";
 import { MyStore } from "./common/MyStore.mjs";
 import { Utilidades } from "./common/Utilidades.mjs";

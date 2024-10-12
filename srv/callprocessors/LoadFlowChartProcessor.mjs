@@ -1,7 +1,7 @@
-import { FlowChartExec } from "../../srcJs/flowchart/FlowChartExec.js";
+import { FlowChartExec } from "@ejfdelgado/ejflab-common/src/flowchart/FlowChartExec.js";
 import { GenericProcessor } from "./GenericProcessor.mjs";
 import fs from "fs";
-import { SimpleObj } from "../../srcJs/SimpleObj.js";
+import { SimpleObj } from "@ejfdelgado/ejflab-common/src/SimpleObj.js";
 import { Buffer } from 'buffer';
 
 const WORKSPACE = process.env.WORKSPACE;

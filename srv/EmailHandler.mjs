@@ -1,9 +1,9 @@
 import sgMail from "@sendgrid/mail";
-import { MyConstants } from "../srcJs/MyConstants.js";
+import { MyConstants } from "@ejfdelgado/ejflab-common/src/MyConstants.js";
 import { MainHandler } from "./MainHandler.mjs";
-import { MyTemplate } from "../srcJs/MyTemplate.js";
+import { MyTemplate } from "@ejfdelgado/ejflab-common/src/MyTemplate.js";
 import { General } from "./common/General.mjs";
-import MyDatesBack from "../srcJs/MyDatesBack.mjs";
+import MyDatesBack from "@ejfdelgado/ejflab-common/src/MyDatesBack.mjs";
 
 export class EmailHandler {
   static async send(req, res) {

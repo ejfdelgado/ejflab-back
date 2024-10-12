@@ -1,7 +1,7 @@
 import { MyStore } from "./common/MyStore.mjs";
 import { General } from "./common/General.mjs";
 import axios from "axios";
-import { ModuloDatoSeguroBack } from "../srcJs/ModuloDatoSeguroBack.mjs";
+import { ModuloDatoSeguroBack } from "@ejfdelgado/ejflab-common/src/ModuloDatoSeguroBack.mjs";
 
 const MAX_READ_SIZE = 60;
 

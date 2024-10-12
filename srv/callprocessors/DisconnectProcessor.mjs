@@ -1,5 +1,5 @@
 import { GenericProcessor } from "./GenericProcessor.mjs";
-import { SimpleObj } from "../../srcJs/SimpleObj.js";
+import { SimpleObj } from "@ejfdelgado/ejflab-common/src/SimpleObj.js";
 
 
 export class DisconnectProcessor extends GenericProcessor {

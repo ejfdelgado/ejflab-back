@@ -3,10 +3,10 @@ import sharp from "sharp";
 import { Buffer } from 'buffer';
 import { Storage } from '@google-cloud/storage';
 import ReadableStreamClone from 'readable-stream-clone'
-import { MyConstants } from "../srcJs/MyConstants.js";
+import { MyConstants } from "@ejfdelgado/ejflab-common/src/MyConstants.js";
 import { General } from "./common/General.mjs";
 import { PassThrough } from "stream";
-import { Gif } from "../srcJs/gif/index.mjs";
+import { Gif } from "@ejfdelgado/ejflab-common/src/gif/index.mjs";
 
 const storage = new Storage();
 

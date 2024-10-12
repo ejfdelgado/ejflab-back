@@ -3,11 +3,11 @@ import fs from "fs";
 import path from "path";
 import { guessMimeType } from "./common/MimeTypeMap.mjs";
 import { MainReplacer } from "./MainReplacer.mjs";
-import { MyRoutes } from "../srcJs/MyRoutes.js";
+import { MyRoutes } from "@ejfdelgado/ejflab-common/src/MyRoutes.js";
 import { PageSrv } from "./PageSrv.mjs";
-import { ModuloDatoSeguro } from "../srcJs/ModuloDatoSeguro.js";
-import { ModuloDatoSeguroBack } from "../srcJs/ModuloDatoSeguroBack.mjs";
-import { MyConstants } from "../srcJs/MyConstants.js";
+import { ModuloDatoSeguro } from "@ejfdelgado/ejflab-common/src/ModuloDatoSeguro.js";
+import { ModuloDatoSeguroBack } from "@ejfdelgado/ejflab-common/src/ModuloDatoSeguroBack.mjs";
+import { MyConstants } from "@ejfdelgado/ejflab-common/src/MyConstants.js";
 
 export class MainHandler {
     static LOCAL_FOLDER = path.resolve() + "/dist/bundle";

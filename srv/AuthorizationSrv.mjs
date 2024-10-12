@@ -5,8 +5,8 @@ import {
 } from "./MyError.mjs";
 import { General } from "./common/General.mjs";
 import { MyStore } from "./common/MyStore.mjs";
-import MyDatesBack from "../srcJs/MyDatesBack.mjs";
-import { MyConstants } from "../srcJs/MyConstants.js";
+import MyDatesBack from "@ejfdelgado/ejflab-common/src/MyDatesBack.mjs";
+import { MyConstants } from "@ejfdelgado/ejflab-common/src/MyConstants.js";
 
 const AUTH_TYPE = "auth";
 const MAX_READ_SIZE = 30;

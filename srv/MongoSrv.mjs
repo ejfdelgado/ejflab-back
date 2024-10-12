@@ -1,6 +1,6 @@
 import { MongoClient, ObjectId } from 'mongodb'
 import * as noqlModule from '@synatic/noql';
-import * as sortifyModule from "../srcJs/sortify.js";
+import * as sortifyModule from "@ejfdelgado/ejflab-common/src/sortify.js";
 
 const SQLParser = noqlModule.default;
 const sortify = sortifyModule.default;

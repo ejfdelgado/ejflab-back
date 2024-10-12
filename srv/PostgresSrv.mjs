@@ -1,6 +1,6 @@
 import pg from 'pg'
 import fs from "fs";
-import { MyTemplate } from '../srcJs/MyTemplate.js';
+import { MyTemplate } from '@ejfdelgado/ejflab-common/src/MyTemplate.js';
 const { Pool } = pg
 
 

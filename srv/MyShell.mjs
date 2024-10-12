@@ -3,7 +3,7 @@ import fs from "fs";
 import { spawn } from "child_process";
 import { General } from "./common/General.mjs";
 import { InesperadoException } from "./MyError.mjs";
-import { IdGen } from "../srcJs/IdGen.js";
+import { IdGen } from "@ejfdelgado/ejflab-common/src/IdGen.js";
 
 export class ExecFolder {
     constructor() {

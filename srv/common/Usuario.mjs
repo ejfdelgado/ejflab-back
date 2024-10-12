@@ -1,6 +1,6 @@
-import { MyUtilities } from "../../srcJs/MyUtilities.js";
+import { MyUtilities } from "@ejfdelgado/ejflab-common/src/MyUtilities.js";
 import { MyFileService } from "../MyFileService.mjs";
-import { MyConstants } from "../../srcJs/MyConstants.js";
+import { MyConstants } from "@ejfdelgado/ejflab-common/src/MyConstants.js";
 import { MyStore } from "./MyStore.mjs";
 import { General } from "./General.mjs";
 import { MalaPeticionException } from "../MyError.mjs";

@@ -1,9 +1,9 @@
 
-import { MyDates } from "../srcJs/MyDates.js";
-import { ModuloDatoSeguro } from "../srcJs/ModuloDatoSeguro.js";
+import { MyDates } from "@ejfdelgado/ejflab-common/src/MyDates.js";
+import { ModuloDatoSeguro } from "@ejfdelgado/ejflab-common/src/ModuloDatoSeguro.js";
 import { General } from "./common/General.mjs";
 import { MyStore } from "./common/MyStore.mjs";
-import { ModuloDatoSeguroBack } from "../srcJs/ModuloDatoSeguroBack.mjs";
+import { ModuloDatoSeguroBack } from "@ejfdelgado/ejflab-common/src/ModuloDatoSeguroBack.mjs";
 
 const KEYS_TYPE = "page-key";
 const DEFAULT_KEY_SIZE = 10;

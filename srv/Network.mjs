@@ -1,7 +1,7 @@
 import md5 from "md5";
 import { Buffer } from "buffer";
 import { MyError } from "./MyError.mjs";
-import { MyUtilities } from "../srcJs/MyUtilities.js";
+import { MyUtilities } from "@ejfdelgado/ejflab-common/src/MyUtilities.js";
 
 function stringify(circ) {
     var cache = [];

@@ -1,8 +1,8 @@
-import { SimpleObj } from "../../srcJs/SimpleObj.js";
+import { SimpleObj } from "@ejfdelgado/ejflab-common/src/SimpleObj.js";
 import { GenericProcessor } from "./GenericProcessor.mjs";
 
 
-export class RegisterProcessorProcessor extends GenericProcessor {
+export class RegisterSourceProcessor extends GenericProcessor {
     constructor(context, io, socket) {
         super(context, io, socket);
     }
@@ -11,13 +11,12 @@ export class RegisterProcessorProcessor extends GenericProcessor {
         const room = this.context.getRoomFromSocket(this.socket);
         const instance = await this.context.getFlowChartExec(room);
         if (!instance) {
-            console.log(`No flowchart for room ${room}`);
             return;
         }
         const roomData = this.context.getRoomLiveTupleModel(room);
         roomData.model.data = instance.getData();
-        SimpleObj.recreate(roomData.model, `data.state.processors.${uid}.socket`, this.socket.id);
-        let changes = roomData.builder.trackDifferences(roomData.model, [], null, ["data", "data.state", "data.state.processors"]);
+        SimpleObj.recreate(roomData.model, `data.state.sources.${uid}.socket`, this.socket.id);
+        let changes = roomData.builder.trackDifferences(roomData.model, [], null, ["data", "data.state", "data.state.sources"]);
         roomData.model = roomData.builder.affect(changes);
     }
 }

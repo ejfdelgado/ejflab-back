@@ -1,12 +1,14 @@
-import { MyUtilities } from "../srcJs/MyUtilities.js";
-import { MyRoutes } from "../srcJs/MyRoutes.js"
+import { MyUtilities } from "@ejfdelgado/ejflab-common/src/MyUtilities.js";
+import { MyRoutes } from "@ejfdelgado/ejflab-common/src/MyRoutes.js"
 import { General } from "./common/General.mjs";
 import { MyStore } from "./common/MyStore.mjs";
 import { Utilidades } from "./common/Utilidades.mjs";
 import { MalaPeticionException, NoExisteException } from "./MyError.mjs";
 import { AuthorizationSrv } from "./AuthorizationSrv.mjs";
-import { MyConstants } from "../srcJs/MyConstants.js";
-import { ModuloDatoSeguroBack } from "../srcJs/ModuloDatoSeguroBack.mjs";
+import { MyConstants } from "@ejfdelgado/ejflab-common/src/MyConstants.js";
+import { ModuloDatoSeguroBack } from "@ejfdelgado/ejflab-common/src/ModuloDatoSeguroBack.mjs";
+
+
 
 const PAGE_TYPE = "page";
 const PAGE_DELETE_TYPE = "page-delete";

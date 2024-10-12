@@ -1,7 +1,7 @@
 import { MyStore } from "./common/MyStore.mjs";
 import { MalaPeticionException, NoExisteException } from "./MyError.mjs";
 import { General } from "./common/General.mjs";
-import MyDatesBack from "../srcJs/MyDatesBack.mjs";
+import MyDatesBack from "@ejfdelgado/ejflab-common/src/MyDatesBack.mjs";
 import { KeysSrv } from "./KeysSrv.mjs";
 
 const TUPLE_TYPE = "tuple";

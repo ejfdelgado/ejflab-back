@@ -1,4 +1,4 @@
-import { SimpleObj } from "../../srcJs/SimpleObj.js";
+import { SimpleObj } from "@ejfdelgado/ejflab-common/src/SimpleObj.js";
 import { GenericProcessor } from "./GenericProcessor.mjs";
 
 

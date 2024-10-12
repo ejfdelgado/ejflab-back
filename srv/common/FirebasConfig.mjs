@@ -4,7 +4,7 @@ import { MyError } from '../MyError.mjs';
 import { Usuario } from './Usuario.mjs';
 import fs from "fs";
 import { General } from './General.mjs';
-import { MyConstants } from '../../srcJs/MyConstants.js';
+import { MyConstants } from '@ejfdelgado/ejflab-common/src/MyConstants.js';
 
 function getFirebaseConfig() {
     const firebaseJson = fs.readFileSync(MyConstants.FIREBASE_CONFIG_FILE, { encoding: "utf8" });
