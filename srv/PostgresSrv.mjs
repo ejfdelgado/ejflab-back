@@ -1,15 +1,21 @@
-import pg from 'pg'
+import pg from "pg";
 import fs from "fs";
-import { MyTemplate } from '@ejfdelgado/ejflab-common/src/MyTemplate.js';
-const { Pool } = pg
-
+import { MyTemplate } from "@ejfdelgado/ejflab-common/src/MyTemplate.js";
+const { Pool } = pg;
 
 export class PostgresSrv {
     static renderer = new MyTemplate();
     static pool = null;
     static {
         PostgresSrv.renderer.registerFunction("noQuotes", PostgresSrv.noQuotes);
-        PostgresSrv.renderer.registerFunction("sanitizeText", PostgresSrv.sanitizeText);
+        PostgresSrv.renderer.registerFunction(
+            "sanitizeNumber",
+            PostgresSrv.sanitizeNumber
+        );
+        PostgresSrv.renderer.registerFunction(
+            "sanitizeText",
+            PostgresSrv.sanitizeText
+        );
         const types = pg.types;
         types.setTypeParser(types.builtins.INT8, function (val) {
             const bigNumber = BigInt(val);
@@ -25,8 +31,25 @@ export class PostgresSrv {
     }
     static sanitizeText(val, ...args) {
         let text = val;
+        if ([null, undefined].indexOf(text) >= 0) {
+            if (typeof args[0] == "string") {
+                return args[0];
+            }
+            return "";
+        }
+        text = `${text}`;
         text = PostgresSrv.noQuotes(text);
         return text;
+    }
+    static sanitizeNumber(val, ...args) {
+        let myNumber = parseFloat(val);
+        if (isNaN(myNumber)) {
+            if (typeof args[0] == "number") {
+                return args[0];
+            }
+            return 0;
+        }
+        return myNumber;
     }
     static getConnectionParams() {
         const host = process.env.POSTGRES_HOST || "postgres";
@@ -39,22 +62,22 @@ export class PostgresSrv {
             port,
             database,
             user,
-            password
+            password,
         };
     }
 
     static async executeTextInTransaction(sql, model = {}) {
         const pool = PostgresSrv.getPool();
         const client = await pool.connect();
-        await client.query('BEGIN')
+        await client.query("BEGIN");
         try {
             // Insert into media
             const result = await PostgresSrv.executeText(sql, model, client);
-            await client.query('COMMIT');
+            await client.query("COMMIT");
             return result;
         } catch (e) {
-            await client.query('ROLLBACK');
-            throw e
+            await client.query("ROLLBACK");
+            throw e;
         } finally {
             client.release();
         }
@@ -67,7 +90,7 @@ export class PostgresSrv {
         if (!client) {
             const pool = PostgresSrv.getPool();
             localClient = true;
-            client = await pool.connect()
+            client = await pool.connect();
         }
         const result = await client.query(sqlRendered);
         if (localClient) {
@@ -106,4 +129,34 @@ export class PostgresSrv {
         const row = result.rows[0];
         res.status(200).send({ row });
     }
+
+    static async simpleTest() {
+        const testsNumber = [
+            { type: 'sanitizeNumber', in: undefined, expected: 0, def: undefined },
+            { type: 'sanitizeNumber', in: null, expected: 0, def: undefined },
+            { type: 'sanitizeNumber', in: "", expected: 0, def: undefined },
+            { type: 'sanitizeNumber', in: undefined, expected: 1, def: 1 },
+            { type: 'sanitizeNumber', in: null, expected: 1, def: 1 },
+            { type: 'sanitizeNumber', in: "", expected: 1, def: 1 },
+            { type: 'sanitizeNumber', in: "3", expected: 3, def: 1 },
+            { type: 'sanitizeNumber', in: "5.26", expected: 5.26, def: 1 },
+            //
+            { type: 'sanitizeText', in: undefined, expected: "" },
+            { type: 'sanitizeText', in: null, expected: "" },
+            { type: 'sanitizeText', in: 5, expected: "5" },
+            { type: 'sanitizeText', in: undefined, expected: "nothing", def: "nothing" },
+            { type: 'sanitizeText', in: null, expected: "nothing", def: "nothing" },
+            { type: 'sanitizeText', in: "", expected: "", def: "nothing" },
+        ];
+        for (let i = 0; i < testsNumber.length; i++) {
+            const actual = testsNumber[i];
+            const returned = this[actual.type](actual.in, actual.def);
+            if (JSON.stringify(returned) != JSON.stringify(actual.expected)) {
+                throw new Error(`Test ${i + 1} In: ${actual.in} Actual: ${returned} but expected ${actual.expected}`);
+            }
+        }
+        console.log(`Test passed ${testsNumber.length}!`);
+    }
 }
+
+//PostgresSrv.simpleTest();
