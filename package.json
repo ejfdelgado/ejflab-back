@@ -9,7 +9,8 @@
   "scripts": {
     "mylogin": "npm login",
     "mypublish": "npm publish --access=public",
-    "diff": "unset GTK_PATH && git difftool"
+    "diff": "unset GTK_PATH && git difftool",
+    "clean": "rm -rf node_modules && npm cache clean --force && rm package-lock.json && npm install"
   },
   "engines": {
     "node": ">=14.0.0"
@@ -18,7 +19,7 @@
   "license": "ISC",
   "private": false,
   "dependencies": {
-    "@ejfdelgado/ejflab-common": "1.2.2",
+    "@ejfdelgado/ejflab-common": "1.2.3",
     "@google-cloud/compute": "^4.7.0",
     "@google-cloud/firestore": "^7.9.0",
     "@google-cloud/storage": "^7.11.3",
