@@ -1,6 +1,6 @@
 {
   "name": "@ejfdelgado/ejflab-back",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ejfdelgado/ejflab-back.git"
@@ -8,7 +8,7 @@
   "description": "",
   "scripts": {
     "mylogin": "npm login",
-    "mypublish": "npm publish --access=public",
+    "mypublish": "npm install && npm publish --access=public",
     "diff": "unset GTK_PATH && git difftool",
     "clean": "rm -rf node_modules && npm cache clean --force && rm package-lock.json && npm install"
   },
