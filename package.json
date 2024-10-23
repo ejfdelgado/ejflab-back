@@ -9,7 +9,6 @@
   "scripts": {
     "mylogin": "npm login",
     "mypublish": "npm install && npm publish --access=public",
-    "diff": "unset GTK_PATH && git difftool",
     "clean": "rm -rf node_modules && npm cache clean --force && rm package-lock.json && npm install"
   },
   "engines": {
