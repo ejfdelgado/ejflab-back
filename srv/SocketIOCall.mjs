@@ -350,7 +350,9 @@ export class SocketIOCall {
 
     static handle(io) {
         SocketIOCall.io = io;
-        SocketIOCall.getFlowChartExec("processors");
+        SocketIOCall.getFlowChartExec("processors").catch((err) => {
+            console.log("Warning: flowchart capability not configured. "+err.message);
+        });
         io.on("connection", SocketIOCall.connect);
         return () => { }
     }
