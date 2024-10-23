@@ -30,6 +30,7 @@ import { ChatSetSawProcessor } from "./callprocessors/ChatSetSawProcessor.mjs";
 import { MilvusSrv } from "./MilvusSrv.mjs";
 import { MongoSrv } from "./MongoSrv.mjs";
 import { MinioSrv } from "./MinioSrv.mjs";
+import { PostgresSrv } from "./PostgresSrv.mjs";
 import { OpenVideoChatProcessor } from "./callprocessors/OpenVideoChatProcessor.mjs";
 import { CloseVideoChatProcessor } from "./callprocessors/CloseVideoChatProcessor.mjs";
 import { IncludeOtherPeersProcessor } from "./callprocessors/IncludeOtherPeersProcessor.mjs";
@@ -69,6 +70,10 @@ export class SocketIOCall {
 
     static getMinioClient() {
         return MinioSrv;
+    }
+
+    static getPostgresClient() {
+        return PostgresSrv;
     }
 
     static async autoCreateRoomFlowChart(room) {
@@ -351,7 +356,7 @@ export class SocketIOCall {
     static handle(io) {
         SocketIOCall.io = io;
         SocketIOCall.getFlowChartExec("processors").catch((err) => {
-            console.log("Warning: flowchart capability not configured. "+err.message);
+            console.log("Warning: flowchart capability not configured. " + err.message);
         });
         io.on("connection", SocketIOCall.connect);
         return () => { }
