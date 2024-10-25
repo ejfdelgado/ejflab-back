@@ -70,6 +70,7 @@ export class LoadFlowChartProcessor extends GenericProcessor {
         }
 
         data['scope'] = { room, progress: 0 };
+        data['env'] = JSON.parse(JSON.stringify(process.env));
 
         // Leer el archivo y su data
         instance = new FlowChartExec();
