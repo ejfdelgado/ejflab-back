@@ -174,6 +174,10 @@ export class SocketIOCall {
         return roomMap[uuid];
     }
 
+    static emitToRoom(room, command, value = {}) {
+        SocketIOCall.io.to(room).emit(command, value);
+    }
+
     static async unregisterSocket(socket) {
         delete SocketIOCall.socketIdToSocket[socket.id];
         const headers = SocketIOCall.getCustomHeaders(socket);
