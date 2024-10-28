@@ -8,14 +8,9 @@ export class PostgresSrv {
     static pool = null;
     static {
         PostgresSrv.renderer.registerFunction("noQuotes", PostgresSrv.noQuotes);
-        PostgresSrv.renderer.registerFunction(
-            "sanitizeNumber",
-            PostgresSrv.sanitizeNumber
-        );
-        PostgresSrv.renderer.registerFunction(
-            "sanitizeText",
-            PostgresSrv.sanitizeText
-        );
+        PostgresSrv.renderer.registerFunction("sanitizeNumber", PostgresSrv.sanitizeNumber);
+        PostgresSrv.renderer.registerFunction("sanitizeText", PostgresSrv.sanitizeText);
+        PostgresSrv.renderer.registerFunction("sanitizeTextNull", PostgresSrv.sanitizeTextNull);
         const types = pg.types;
         types.setTypeParser(types.builtins.INT8, function (val) {
             const bigNumber = BigInt(val);
@@ -41,13 +36,20 @@ export class PostgresSrv {
         text = PostgresSrv.noQuotes(text);
         return text;
     }
+    static sanitizeTextNull(val, ...args) {
+        if ([null, undefined].indexOf(val) >= 0) {
+            return "NULL";
+        }
+        let text = PostgresSrv.noQuotes(`${val}`, args);
+        return "'" + text + "'";
+    }
     static sanitizeNumber(val, ...args) {
         let myNumber = parseFloat(val);
         if (isNaN(myNumber)) {
             if (typeof args[0] == "number") {
                 return args[0];
             }
-            return 0;
+            return 'NULL';
         }
         return myNumber;
     }
@@ -132,9 +134,9 @@ export class PostgresSrv {
 
     static async simpleTest() {
         const testsNumber = [
-            { type: 'sanitizeNumber', in: undefined, expected: 0, def: undefined },
-            { type: 'sanitizeNumber', in: null, expected: 0, def: undefined },
-            { type: 'sanitizeNumber', in: "", expected: 0, def: undefined },
+            { type: 'sanitizeNumber', in: undefined, expected: 'NULL', def: undefined },
+            { type: 'sanitizeNumber', in: null, expected: 'NULL', def: undefined },
+            { type: 'sanitizeNumber', in: "", expected: 'NULL', def: undefined },
             { type: 'sanitizeNumber', in: undefined, expected: 1, def: 1 },
             { type: 'sanitizeNumber', in: null, expected: 1, def: 1 },
             { type: 'sanitizeNumber', in: "", expected: 1, def: 1 },
@@ -147,6 +149,12 @@ export class PostgresSrv {
             { type: 'sanitizeText', in: undefined, expected: "nothing", def: "nothing" },
             { type: 'sanitizeText', in: null, expected: "nothing", def: "nothing" },
             { type: 'sanitizeText', in: "", expected: "", def: "nothing" },
+            //
+            { type: 'sanitizeTextNull', in: "", expected: "''", def: "" },
+            { type: 'sanitizeTextNull', in: null, expected: "NULL", def: "" },
+            { type: 'sanitizeTextNull', in: undefined, expected: "NULL", def: "" },
+            { type: 'sanitizeTextNull', in: 5, expected: "'5'", def: "" },
+            { type: 'sanitizeTextNull', in: "Prueba'", expected: "'Prueba'''", def: "" },
         ];
         for (let i = 0; i < testsNumber.length; i++) {
             const actual = testsNumber[i];
@@ -156,7 +164,10 @@ export class PostgresSrv {
             }
         }
         console.log(`Test passed ${testsNumber.length}!`);
+
+        //console.log(PostgresSrv.renderer.render('Hola ${name} with age ${age | sanitizeNumber :  0}', {name: "Edgar", age: undefined}));
     }
 }
 
+// node PostgresSrv.mjs
 //PostgresSrv.simpleTest();
