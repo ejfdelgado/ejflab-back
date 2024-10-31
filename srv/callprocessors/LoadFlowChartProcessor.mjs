@@ -25,7 +25,15 @@ export class LoadFlowChartProcessor extends GenericProcessor {
     }
 
     async execute(args) {
-        let { names, conf, dataPath, dataVal, room, skipValidation } = args;
+        let {
+            names,
+            conf,
+            dataPath,
+            dataVal,
+            room,
+            skipValidation,
+            multiples
+        } = args;
         console.log(`LoadFlowChartProcessor at room ${room}...`);
         this.completePaths(names);
         this.completePaths(dataPath);
@@ -86,6 +94,7 @@ export class LoadFlowChartProcessor extends GenericProcessor {
         roomData.model.history = [];
         roomData.model.flowchart = flowchart;
         roomData.model.data = data;
+        roomData.model.multiples = multiples;
         roomData.model.version = 0;
         // So it will be capable to reload from this point
         roomData.model.request = Buffer.from(JSON.stringify(args), "utf8").toString("base64");
