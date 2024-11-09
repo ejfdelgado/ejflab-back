@@ -45,6 +45,9 @@ export class DisconnectProcessor extends GenericProcessor {
         if (people) {
             this.clearPersonFromPeople(people, socketId);
         }
+        // Also try to remove the socket from the root
+        const data = SimpleObj.getValue(roomData.model, "data", null);
+        this.clearPersonFromPeople(data, socketId);
 
         const observe = ["data", "data.state", "data.state.sources", "data.state.processors", "data.people"];
         let changes = roomData.builder.trackDifferences(roomData.model, [], null, observe);
