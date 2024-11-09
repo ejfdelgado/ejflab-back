@@ -92,7 +92,7 @@ export class SocketIOCall {
             room,
         };
         const socket = null;
-        await new LoadFlowChartProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+        await new LoadFlowChartProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         return this.mapFlowChartExec[room];
     }
 
@@ -243,19 +243,19 @@ export class SocketIOCall {
 
         socket.on("callUser", (payload) => {
             SocketIOCall.echoLog(`${socket.id} sends callUser`);
-            new CallUserProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new CallUserProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("makeAnswer", (payload) => {
             SocketIOCall.echoLog(`${socket.id} sends makeAnswer`);
-            new MakeAnswerProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new MakeAnswerProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("onicecandidate", (payload) => {
             SocketIOCall.echoLog(`${socket.id} sends onicecandidate`);
-            new OnIceCandidateProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new OnIceCandidateProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("disconnect", (payload) => {
             SocketIOCall.echoLog(`${socket.id} sends disconnect with ${JSON.stringify(payload)}`);
-            new DisconnectProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new DisconnectProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
             SocketIOCall.disconnect(socket);
         });
         /*
@@ -265,91 +265,92 @@ export class SocketIOCall {
         });*/
         socket.on("askRoom", (payload) => {
             SocketIOCall.echoLog(`${socket.id} sends askRoom with ${JSON.stringify(payload)}`);
-            new AskRoomProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new AskRoomProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("clientChange", (payload) => {
-            new ClientChangeProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new ClientChangeProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("getModel", (payload) => {
-            new GetModelProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new GetModelProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("loadFlowchart", (payload) => {
             SocketIOCall.echoLog(`${socket.id} sends loadFlowchart with ${JSON.stringify(payload)}`);
-            new LoadFlowChartProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new LoadFlowChartProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("startFlowChart", (payload) => {
             SocketIOCall.echoLog(`${socket.id} sends startFlowChart with ${JSON.stringify(payload)}`);
-            new StartFlowChartProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new StartFlowChartProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("stopFlowChart", (payload) => {
             SocketIOCall.echoLog(`${socket.id} sends stopFlowChart with ${JSON.stringify(payload)}`);
-            new StopFlowChartProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new StopFlowChartProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("pauseFlowChart", (payload) => {
             SocketIOCall.echoLog(`${socket.id} sends pauseFlowChart with ${JSON.stringify(payload)}`);
-            new PauseFlowChartProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new PauseFlowChartProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("destroyModel", (payload) => {
             SocketIOCall.echoLog(`${socket.id} sends destroyModel with ${JSON.stringify(payload)}`);
-            new DestroyModelProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new DestroyModelProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("askiceservers", (payload) => {
             SocketIOCall.echoLog(`${socket.id} sends askiceservers with ${JSON.stringify(payload)}`);
-            new AskIceServersProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new AskIceServersProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("registerSource", (payload) => {
             SocketIOCall.echoLog(`${socket.id} sends registerSource with ${JSON.stringify(payload)}`);
-            new RegisterSourceProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new RegisterSourceProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("registerProcessor", (payload) => {
             SocketIOCall.echoLog(`${socket.id} sends registerProcessor with ${JSON.stringify(payload)}`);
-            new RegisterProcessorProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new RegisterProcessorProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
 
         socket.on("checkSrcResponse", (payload) => {
             //SocketIOCall.echoLog(`${socket.id} sends checkSrcResponse with ${JSON.stringify(payload)}`);
-            new CheckSrcResponseProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new CheckSrcResponseProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("readSrcResponse", (payload) => {
             //SocketIOCall.echoLog(`${socket.id} sends readSrcResponse with ${JSON.stringify(payload)}`);
-            new ReadSrcResponseProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new ReadSrcResponseProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("processResponse", (payload) => {
             //SocketIOCall.echoLog(`${socket.id} sends processResponse with ${JSON.stringify(payload)}`);
-            new ProcessResponseProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new ProcessResponseProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("subscribeme", (payload) => {
             SocketIOCall.echoLog(`${socket.id} sends subscribeme with ${JSON.stringify(payload)}`);
-            new SubscribemeProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new SubscribemeProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("sendChat", (payload) => {
             //SocketIOCall.echoLog(`${socket.id} sends sendChat with ${JSON.stringify(payload)}`);
-            new SendChatProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new SendChatProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("updateMyInformation", (payload) => {
             //SocketIOCall.echoLog(`${socket.id} sends updateMyInformation with ${JSON.stringify(payload)}`);
-            new UpdateMyInformationProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new UpdateMyInformationProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("chatSetSawProcessor", (payload) => {
             //SocketIOCall.echoLog(`${socket.id} sends chatSetSawProcessor with ${JSON.stringify(payload)}`);
-            new ChatSetSawProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new ChatSetSawProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("openVideoChat", (payload) => {
             //SocketIOCall.echoLog(`${socket.id} sends openVideoChat with ${JSON.stringify(payload)}`);
-            new OpenVideoChatProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new OpenVideoChatProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("closeVideoChat", (payload) => {
             //SocketIOCall.echoLog(`${socket.id} sends closeVideoChat with ${JSON.stringify(payload)}`);
-            new CloseVideoChatProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new CloseVideoChatProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
         socket.on("includeOtherPeers", (payload) => {
             //SocketIOCall.echoLog(`${socket.id} sends includeOtherPeers with ${JSON.stringify(payload)}`);
-            new IncludeOtherPeersProcessor(SocketIOCall, SocketIOCall.io, socket).execute(payload);
+            new IncludeOtherPeersProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
     }
 
     static async disconnect(socket) {
         const headers = SocketIOCall.getCustomHeaders(socket);
+        //socket.off();
         // Lo saco de la lista en memoria
         await SocketIOCall.unregisterSocket(socket);
         SocketIOCall.io.to(headers.room).emit("removeUser", {
@@ -369,7 +370,7 @@ export class SocketIOCall {
     static async processorResponse(req, res, next) {
         const buffer = req.body;
         const decoded = decode(buffer);
-        await new ProcessResponseProcessor(SocketIOCall, SocketIOCall.io, null).execute(decoded);
+        await new ProcessResponseProcessor(SocketIOCall, SocketIOCall.io, null).executeSave(decoded);
         res.status(200).send({
             status: "ok",
         });
@@ -377,9 +378,9 @@ export class SocketIOCall {
 
     static async loadFlowChart(req, res, next) {
         const buffer = req.body;
-        await new LoadFlowChartProcessor(SocketIOCall, SocketIOCall.io, null).execute(buffer);
+        await new LoadFlowChartProcessor(SocketIOCall, SocketIOCall.io, null).executeSave(buffer);
         if (buffer.autoStart === true) {
-            new StartFlowChartProcessor(SocketIOCall, SocketIOCall.io, null).execute(buffer);
+            new StartFlowChartProcessor(SocketIOCall, SocketIOCall.io, null).executeSave(buffer);
         }
         res.status(200).send({
             status: "ok",
