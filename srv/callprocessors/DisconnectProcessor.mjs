@@ -20,7 +20,7 @@ export class DisconnectProcessor extends GenericProcessor {
     clearPersonFromPeople(people, socketId) {
         for (let personId in people) {
             const onePerson = people[personId];
-            if (onePerson.socket == socketId) {
+            if (onePerson.socket == socketId || socketId == personId) {
                 delete people[personId]
                 break;
             }
