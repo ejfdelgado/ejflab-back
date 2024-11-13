@@ -1,4 +1,5 @@
 import { MilvusClient, DataType } from "@zilliz/milvus2-sdk-node";
+import { encode, decode } from "@msgpack/msgpack";
 
 export class MilvusSrv {
     // MilvusSrv.checkErrors(res);
@@ -148,5 +149,87 @@ export class MilvusSrv {
             status: "ok",
         };
         res.status(200).send(response);
+    }
+    static async insert(req, res, next) {
+        console.log("Milvus insert...");
+        const { client } = MilvusSrv.connect();
+        let code = 200;
+        const response = {
+            status: "ok"
+        };
+        try {
+            // get the request
+            const buffer = req.body;
+            const decoded = decode(buffer);
+            const {
+                db_name,
+                collection_name,
+                data
+            } = decoded;
+            await MilvusSrv.useDatabase(client, db_name, false);
+            await client.insert({
+                collection_name: collection_name,
+                data: data
+            });
+            console.log("Milvus insert... OK");
+        } catch (err) {
+            console.log(err);
+            code = 500;
+            response.status = "error";
+            response.message = err.message;
+        } finally {
+            await client.closeConnection();
+            res.status(code).send(response);
+        }
+    }
+    static async search(req, res, next) {
+        const { client } = MilvusSrv.connect();
+        let code = 200;
+        const response = {
+            status: "ok"
+        };
+        try {
+            // get the request
+            const buffer = req.body;
+            const decoded = decode(buffer);
+            // Connect to database
+            const {
+                db_name,
+                collection_name,
+                embeed,
+                paging
+            } = decoded;
+            console.log(`Using database ${db_name}`);
+            await MilvusSrv.useDatabase(client, db_name, false);
+            const search_params = {
+                "metric_type": "IP",
+                "topk": paging['limit'],
+                "params": JSON.stringify({ nprobe: 1024 }),
+            };
+            const results = await client.search({
+                collection_name: collection_name,
+                data: [embeed],
+                limit: paging['limit'],
+                offset: paging['offset'],
+                consistency_level: "Strong",
+                search_params: search_params,
+                output_fields: ['id', 'document_id', 'face_path', 'millis', 'x1', 'y1', 'x2', 'y2', 'ref_id']
+            });
+            response.results = results.results.map((entity) => {
+                return {
+                    id: entity.id,
+                    distance: 0,
+                    entity
+                };
+            });
+        } catch (err) {
+            console.log(err);
+            code = 500;
+            response.status = "error";
+            response.message = err.message;
+        } finally {
+            await client.closeConnection();
+            res.status(code).send(response);
+        }
     }
 }
