@@ -203,7 +203,7 @@ export class SocketIOCall {
     }
 
     static getCustomHeaders(socket) {
-        const headersKey = ["room", "uuid"];
+        const headersKey = ["room", "uuid", "model"];
         const headers = socket.handshake.headers;
         const response = {};
         headersKey.forEach((key) => {
@@ -216,6 +216,23 @@ export class SocketIOCall {
         await SocketIOCall.registerSocket(socket);
         // Le digo a los que están en el room quién llegó
         const headers = SocketIOCall.getCustomHeaders(socket);
+        // Update model if provided
+        let defaultModel;
+        try {
+            defaultModel = headers.model;
+            const room = headers.room;
+            if (defaultModel && room) {
+                const defaultModelJson = JSON.parse(defaultModel);
+                const dataRoom = SocketIOCall.getRoomLiveTupleModel(room);
+                if (dataRoom) {
+                    SimpleObj.recreate(dataRoom, `model.data.people.${socket.id}`, defaultModelJson);
+                    dataRoom.builder.trackDifferences(dataRoom.model, [], null, ["data", "data.people", `data.people.${socket.id}`]);
+                }
+            }
+        } catch (err) {
+            console.log(err);
+            console.log(`Can't create default model. Provided ${defaultModel}`);
+        }
         SocketIOCall.io.to(headers.room).emit("updateUserList", {
             socketIds: SocketIOCall.mapSockets[headers.room]
         });
