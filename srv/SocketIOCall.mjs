@@ -221,7 +221,7 @@ export class SocketIOCall {
         try {
             defaultModel = headers.model;
             const room = headers.room;
-            if (defaultModel && room) {
+            if (defaultModel && defaultModel != "undefined" && room) {
                 const defaultModelJson = JSON.parse(defaultModel);
                 const dataRoom = SocketIOCall.getRoomLiveTupleModel(room);
                 if (dataRoom) {

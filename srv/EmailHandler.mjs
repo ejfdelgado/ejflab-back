@@ -8,6 +8,7 @@ import MyDatesBack from "@ejfdelgado/ejflab-common/src/MyDatesBack.mjs";
 export class EmailHandler {
   static async send(req, res) {
     const useDebug = false;
+    console.log(`Using SEND_GRID_VARIABLE ${process.env.SEND_GRID_VARIABLE.substring(0, 5)}...`);
     sgMail.setApiKey(
       process.env.SEND_GRID_VARIABLE
     );
