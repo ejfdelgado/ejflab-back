@@ -157,22 +157,29 @@ export class MilvusSrv {
         const response = {
             status: "ok"
         };
+        let decoded = null;
         try {
             // get the request
             const buffer = req.body;
-            const decoded = decode(buffer);
+            decoded = decode(buffer);
             const {
                 db_name,
                 collection_name,
                 data
             } = decoded;
             await MilvusSrv.useDatabase(client, db_name, false);
+            let dataArray = data;
+            if (!(dataArray instanceof Array)) {
+                dataArray = [dataArray];
+            }
             await client.insert({
                 collection_name: collection_name,
-                data: data
+                data: dataArray
             });
             console.log("Milvus insert... OK");
         } catch (err) {
+            console.log("Error inserting");
+            console.log(decoded);
             console.log(err);
             code = 500;
             response.status = "error";
