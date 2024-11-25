@@ -6,7 +6,7 @@ export class ProcessResponseProcessor extends GenericProcessor {
         super(context, io, socket);
     }
     async execute(args) {
-        const { processorId, id, data } = args;
+        const { processorId, id, data, inputs } = args;
         let room = "";
         if (args.room) {
             room = args.room;
@@ -67,6 +67,13 @@ export class ProcessResponseProcessor extends GenericProcessor {
             //return;
         }
 
+        let isIndexed = false;
+        let indexN = null;
+        if (inputs instanceof Array && inputs.length > 0 && typeof inputs[0] == "number") {
+            isIndexed = true;
+            indexN = inputs[0];
+        }
+
         roomData.model.data = instance.getData();
         let countLocalChanges = 0;
         if (!!outputConnectionsConf) {
@@ -82,10 +89,15 @@ export class ProcessResponseProcessor extends GenericProcessor {
                         return;
                     }
                     if (!outputParts[4]) {
+                        // Byte case
                         const processorIdLocal = outputParts[2];
                         const sourcePath = outputParts[3];
-                        instance.saveBufferData(processorIdLocal, sourcePath, dataLocal);
-                        // Publish to others
+                        let sourcePathIndexed = sourcePath;
+                        if (isIndexed) {
+                            sourcePathIndexed = sourcePathIndexed + "." + indexN;
+                        }
+                        instance.saveBufferData(processorIdLocal, sourcePathIndexed, dataLocal);
+                        // Publish to others the not indexed?
                         const destiny = `${room}.${output}`;
                         //console.log(`Publishing to ${destiny} ok?`);
                         this.io.to(destiny).emit("processResponse", {
@@ -94,11 +106,16 @@ export class ProcessResponseProcessor extends GenericProcessor {
                             data: dataLocal
                         });
                     } else {
+                        // Json case
                         // Affect the model in the given point
                         const path = outputParts[4];
-                        SimpleObj.recreate(roomData.model.data, path, dataLocal);
+                        let pathIndexed = path;
+                        if (isIndexed) {
+                            pathIndexed = pathIndexed + "." + indexN;
+                        }
+                        SimpleObj.recreate(roomData.model.data, pathIndexed, dataLocal);
                         countLocalChanges++;
-                        // Publish to others
+                        // Publish to others the not indexed one?
                         const destiny = `${room}.d.${path}`;
                         //console.log(`Publishing to ${destiny} ok?`);
                         this.io.to(destiny).emit("processResponse", {
