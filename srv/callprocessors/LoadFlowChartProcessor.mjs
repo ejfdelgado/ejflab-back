@@ -2,6 +2,7 @@ import { FlowChartExec } from "@ejfdelgado/ejflab-common/src/flowchart/FlowChart
 import { GenericProcessor } from "./GenericProcessor.mjs";
 import fs from "fs";
 import { SimpleObj } from "@ejfdelgado/ejflab-common/src/SimpleObj.js";
+import { MyTuples } from "@ejfdelgado/ejflab-common/src/MyTuples.js";
 import { Buffer } from 'buffer';
 
 const WORKSPACE = process.env.WORKSPACE;
@@ -20,6 +21,24 @@ export class LoadFlowChartProcessor extends GenericProcessor {
             if (typeof valor == "string") {
                 valor = valor.replaceAll("${WORKSPACE}", WORKSPACE);
                 objeto[llave] = valor;
+            }
+        }
+    }
+
+    overwriteProcessorEnvVariables(dataObject) {
+        //console.log(JSON.stringify(dataObject, null, 4));
+        const tuples = MyTuples.getTuples(dataObject);
+        //console.log(JSON.stringify(tuples, null, 4));
+        const keys = Object.keys(tuples);
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i];
+            const currentValue = tuples[key];
+            if (typeof currentValue == "string") {
+                const envKey = key.replace(".", "_").toUpperCase();
+                if (envKey in process.env) {
+                    SimpleObj.recreate(dataObject, key, process.env[envKey]);
+                }
+                console.log(`${envKey}=${SimpleObj.getValue(dataObject, key)}`);
             }
         }
     }
@@ -59,7 +78,12 @@ export class LoadFlowChartProcessor extends GenericProcessor {
             const keysData = Object.keys(dataPath);
             for (let i = 0; i < keysData.length; i++) {
                 const keyData = keysData[i];
-                const dataObject = JSON.parse(fs.readFileSync(dataPath[keyData], 'utf8'));
+                const fileName = dataPath[keyData];
+                const dataObject = JSON.parse(fs.readFileSync(fileName, 'utf8'));
+                // Here we can intercept the data model and overwrite given env variables
+                if (fileName.endsWith("processors.json")) {
+                    this.overwriteProcessorEnvVariables(dataObject);
+                }
                 if (keyData.length == 0) {
                     Object.assign(data, dataObject);
                 } else {
