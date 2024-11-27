@@ -79,13 +79,15 @@ export class ProcessResponseProcessor extends GenericProcessor {
         if (!!outputConnectionsConf) {
             outputConnectionsConf.forEach((outputConnectionsConfOne) => {
                 const { key, val } = outputConnectionsConfOne;
-                const output = val;
-                const dataLocal = data[key];
+                const outputPath = val;
+                let dataLocal = data[key];
+                //console.log(`Assigning ${outputPath}`);
+                //console.log(JSON.stringify(dataLocal, null, 4));
                 if (dataLocal != undefined) {
                     // Sends dataResponse to val
-                    const outputParts = /^(b\.([^.]+)\.([^.]+)|d\.(.+))$/i.exec(output);
+                    const outputParts = /^(b\.([^.]+)\.([^.]+)|d\.(.+))$/i.exec(outputPath);
                     if (!outputParts) {
-                        console.log(`${output} does not match ^(b\.([^.]+)\.([^.]+)|d\.(.+))$`);
+                        console.log(`${outputPath} does not match ^(b\.([^.]+)\.([^.]+)|d\.(.+))$`);
                         return;
                     }
                     if (!outputParts[4]) {
@@ -98,7 +100,7 @@ export class ProcessResponseProcessor extends GenericProcessor {
                         }
                         instance.saveBufferData(processorIdLocal, sourcePathIndexed, dataLocal);
                         // Publish to others the not indexed?
-                        const destiny = `${room}.${output}`;
+                        const destiny = `${room}.${outputPath}`;
                         //console.log(`Publishing to ${destiny} ok?`);
                         this.io.to(destiny).emit("processResponse", {
                             processorId,
@@ -107,6 +109,7 @@ export class ProcessResponseProcessor extends GenericProcessor {
                         });
                     } else {
                         // Json case
+                        dataLocal = JSON.parse(JSON.stringify(dataLocal));
                         // Affect the model in the given point
                         const path = outputParts[4];
                         let pathIndexed = path;
@@ -125,7 +128,7 @@ export class ProcessResponseProcessor extends GenericProcessor {
                         });
                     }
                 } else {
-                    console.log(`Skip output connection ${val} with no value`);
+                    console.log(`Skip output connection ${outputPath} with no value`);
                 }
             });
         }
