@@ -4,11 +4,14 @@ import { MainHandler } from "./MainHandler.mjs";
 import { MyTemplate } from "@ejfdelgado/ejflab-common/src/MyTemplate.js";
 import { General } from "./common/General.mjs";
 import MyDatesBack from "@ejfdelgado/ejflab-common/src/MyDatesBack.mjs";
+import * as sortifyModule from "@ejfdelgado/ejflab-common/src/sortify.js";
+
+const sortify = sortifyModule.default;
 
 export class EmailHandler {
   static async send(req, res) {
     const useDebug = false;
-    console.log(`Using SEND_GRID_VARIABLE ${process.env.SEND_GRID_VARIABLE.substring(0, 5)}...`);
+    console.log(`Using SEND_GRID_VARIABLE ${JSON.stringify(process.env.SEND_GRID_VARIABLE.substring(0, 7))}...`);
     sgMail.setApiKey(
       process.env.SEND_GRID_VARIABLE
     );
@@ -41,6 +44,7 @@ export class EmailHandler {
       html: contenidoFinal,
     };
 
+    console.log(`Using EMAIL_SENDER ${JSON.stringify(MyConstants.EMAIL_SENDER)}`);
     //console.log(JSON.stringify(body.params, null, 4));
     //console.log(JSON.stringify(contenidoFinal, null, 4));
 
@@ -48,7 +52,12 @@ export class EmailHandler {
       res.status(200).set({ 'content-type': 'text/html; charset=utf-8' }).send(contenidoFinal).end();
     } else {
       let answer = {};
-      answer = await sgMail.send(msg);
+      try {
+        answer = await sgMail.send(msg);
+      } catch (err) {
+        console.log(sortify(err));
+        throw err;
+      }
       res.status(200).json(answer).end();
     }
   }
