@@ -20,6 +20,14 @@ export class PostgresSrv {
             }
             return Number(bigNumber);
         });
+        types.setTypeParser(types.builtins.NUMERIC, function (val) {
+            const bigNumber = BigInt(val);
+            if (bigNumber > Number.MAX_SAFE_INTEGER) {
+                // Fallback...
+                return 0;
+            }
+            return Number(bigNumber);
+        });
     }
     static noQuotes(val, ...args) {
         return val.replace(/'/g, "''");
