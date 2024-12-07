@@ -43,6 +43,18 @@ export class LoadFlowChartProcessor extends GenericProcessor {
         }
     }
 
+    static getFilteredEnv() {
+        const envClone = JSON.parse(JSON.stringify(process.env));
+        const envCloneKeys = Object.keys(envClone);
+        for (let i = 0; i < envCloneKeys.length; i++) {
+            const key = envCloneKeys[i];
+            if (/pass|secret|key/i.test(key)) {
+                delete envClone[key];
+            }
+        }
+        return envClone;
+    }
+
     async execute(args) {
         let {
             names,
@@ -102,7 +114,7 @@ export class LoadFlowChartProcessor extends GenericProcessor {
         }
 
         data['scope'] = { room, progress: 0 };
-        data['env'] = JSON.parse(JSON.stringify(process.env));
+        data['env'] = LoadFlowChartProcessor.getFilteredEnv();
 
         // Leer el archivo y su data
         instance = new FlowChartExec();

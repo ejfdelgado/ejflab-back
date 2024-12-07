@@ -45,6 +45,7 @@ export class SocketIOCall {
     static mapFlowChartExec = {};
     static socketIdToSocket = {};
     static socketRoomUUIDMap = {};
+    static socketToImage = {};
 
     static echoLog(message) {
         console.log(message);
@@ -274,6 +275,9 @@ export class SocketIOCall {
             SocketIOCall.echoLog(`${socket.id} sends disconnect with ${JSON.stringify(payload)}`);
             new DisconnectProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
             SocketIOCall.disconnect(socket);
+            if (socket.id in SocketIOCall.socketToImage) {
+                delete SocketIOCall.socketToImage[socket.id];
+            }
         });
         /*
         socket.on("reconnect", (payload) => {
@@ -519,5 +523,13 @@ export class SocketIOCall {
             response: data
         };
         res.status(200).send(response);
+    }
+
+    static putSocketImage(socketId, bytes) {
+        SocketIOCall.socketToImage[socketId] = bytes;
+    }
+
+    static getSocketImage(socketId) {
+        return SocketIOCall.socketToImage[socketId];
     }
 }
