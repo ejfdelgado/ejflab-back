@@ -44,6 +44,11 @@ export class EmailHandler {
       html: contenidoFinal,
     };
 
+    if (body.replyTo) {
+      msg.replyTo = body.replyTo;
+      console.log(`replyTo: ${msg.replyTo}`);
+    }
+
     console.log(`Using EMAIL_SENDER ${JSON.stringify(MyConstants.EMAIL_SENDER)}`);
     //console.log(JSON.stringify(body.params, null, 4));
     //console.log(JSON.stringify(contenidoFinal, null, 4));
