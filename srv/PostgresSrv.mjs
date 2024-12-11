@@ -21,12 +21,12 @@ export class PostgresSrv {
             return Number(bigNumber);
         });
         types.setTypeParser(types.builtins.NUMERIC, function (val) {
-            const bigNumber = BigInt(val);
-            if (bigNumber > Number.MAX_SAFE_INTEGER) {
+            const bigNumber = parseFloat(val);
+            if (isNaN(bigNumber)) {
                 // Fallback...
-                return 0;
+                return null;
             }
-            return Number(bigNumber);
+            return bigNumber;
         });
     }
     static noQuotes(val, ...args) {
