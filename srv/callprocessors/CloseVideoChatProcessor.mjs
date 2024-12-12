@@ -6,11 +6,19 @@ export class CloseVideoChatProcessor extends GenericProcessor {
         super(context, io, socket);
     }
     execute(args) {
-        console.log(`CloseVideoChatProcessor... to ${args.room}`);
-        //console.log(JSON.stringify(args, null, 4));
-        // Redirects to other:
-        this.io.to(args.room).emit("closeVideoChat", {
-            room: args.room,
-        });
+        if (args.uuid) {
+            console.log(`CloseVideoChatProcessor... to ${args.uuid}`);
+            // Redirects to other:
+            // Translate args.uuid to socketId of args.room
+            const socketId = this.context.getSocketIdFromRoomAndUUID("public", args.uuid);
+            this.io.to(socketId).emit("closeVideoChat", {
+                room: args.room,
+            });
+        } else {
+            console.log(`CloseVideoChatProcessor... to ${args.room}`);
+            this.io.to(args.room).emit("closeVideoChat", {
+                room: args.room,
+            });
+        }
     }
 }
