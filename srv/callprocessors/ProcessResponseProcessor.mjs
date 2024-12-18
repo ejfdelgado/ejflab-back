@@ -120,7 +120,7 @@ export class ProcessResponseProcessor extends GenericProcessor {
                         countLocalChanges++;
                         // Publish to others the not indexed one?
                         const destiny = `${room}.d.${path}`;
-                        //console.log(`Publishing to ${destiny} ok?`);
+                        console.log(`Publish processResponse to ${destiny}!`);
                         this.io.to(destiny).emit("processResponse", {
                             processorId,
                             sourcePath: path,
