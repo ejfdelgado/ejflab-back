@@ -318,12 +318,13 @@ export class MilvusSrv {
             };
             const results = await client.search(searchPayload);
             if (results.status.code != 0) {
-                throw new MyError(results.status.error_code+". "+results.status.reason)
+                throw new MyError(results.status.error_code + ". " + results.status.reason)
             }
+            //console.log(JSON.stringify(results, null, 4));
             response.results = [results.results.map((entity) => {
                 return {
                     id: entity.id,
-                    distance: 0,
+                    distance: entity.score,//is it the same?
                     entity
                 };
             })];
