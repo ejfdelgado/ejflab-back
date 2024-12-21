@@ -1,5 +1,9 @@
+import fs from "fs";
 import { MilvusClient, DataType } from "@zilliz/milvus2-sdk-node";
 import { encode, decode } from "@msgpack/msgpack";
+import { General } from "./common/General.mjs";
+import { CommandMilvus } from "@ejfdelgado/ejflab-common/src/flowchart/steps/CommandMilvus.js";
+import { SimpleObj } from "@ejfdelgado/ejflab-common/src/SimpleObj.js";
 
 export class MilvusSrv {
     // MilvusSrv.checkErrors(res);
@@ -27,6 +31,10 @@ export class MilvusSrv {
             client
         }
     }
+    static async releaseConnection(client) {
+        console.log("Milvus disconnect");
+        await client.closeConnection();
+    }
     static async existsDatabase(client, name) {
         const res = await client.listDatabases();
         return res.db_names.indexOf(name) >= 0;
@@ -41,9 +49,15 @@ export class MilvusSrv {
         const res = await client.listDatabases();
         MilvusSrv.checkErrors(res);
         const databases = res.db_names;
+        const response = { dbs: [] };
         for (let i = 0; i < databases.length; i++) {
             const database = databases[i];
             console.log(`- Database: ${database}`);
+            const myDb = {
+                name: database,
+                collections: []
+            };
+            response.dbs.push(myDb);
             const resUseDatabase = await client.useDatabase({ db_name: database });
             MilvusSrv.checkErrors(resUseDatabase);
             const resListCollections = await client.listCollections();
@@ -52,8 +66,10 @@ export class MilvusSrv {
             for (let j = 0; j < data.length; j++) {
                 const collection = data[j];
                 console.log(`    - Collection: ${collection.name}`);
+                myDb.collections.push({ name: collection.name });
             }
         }
+        return response;
     }
     static async dropDatabaseTemp(client) {
         const res = await client.listDatabases();
@@ -66,6 +82,21 @@ export class MilvusSrv {
             }
         }
     }
+
+    static async describeCollectionOfDatabase(client, db_name, collection_name) {
+        const resUseDatabase1 = await client.useDatabase({ db_name: db_name });
+        MilvusSrv.checkErrors(resUseDatabase1);
+        const description = await client.describeCollection({ collection_name: collection_name });
+        return description;
+    }
+
+    static async dropCollectionOfDatabase(client, db_name, collection_name) {
+        const resUseDatabase1 = await client.useDatabase({ db_name: db_name });
+        MilvusSrv.checkErrors(resUseDatabase1);
+        await MilvusSrv.dropCollection(client, collection_name);
+        return true;
+    }
+
     static async dropCollection(client, collection_name) {
         console.log(`Drop collection ${collection_name}...`);
         const resHasCollection = await client.hasCollection({ collection_name });
@@ -121,6 +152,7 @@ export class MilvusSrv {
         // Translate data types
         const myCopy = JSON.parse(JSON.stringify(myJson));
         const collection_name = myCopy.collection_name;
+        console.log(`createCollectionWithSchema... ${collection_name}`);
         const exists = await this.existsCollection(client, collection_name);
         if (exists) {
             if (recreate) {
@@ -139,6 +171,56 @@ export class MilvusSrv {
         }
         const res = await client.createCollection(myCopy);
         MilvusSrv.checkErrors(res);
+    }
+    /*
+    action:
+    database.create
+    database.recreate
+    collection.create
+    collection.destroy
+    introspect
+    database.destroy
+    database.destroy_temp
+    */
+    static async admin(req, res, next) {
+        //this.context.getSuperContext().getMilvusClient();
+        const context = {
+            getSuperContext: () => {
+                return {
+                    getMilvusClient: () => {
+                        return MilvusSrv;
+                    }
+                };
+            },
+            data: {
+                configuration: {}
+            },
+        };
+        const id = '';
+        const commandName = 'milvus';
+        const argsTxt = '';
+        const command = new CommandMilvus(context, id, commandName, argsTxt);
+        const action = General.readParam(req, "action", null);
+        const db = General.readParam(req, "db", null);
+        let collection = General.readParam(req, "collection", null);
+        if (action == "collection.create") {
+            // Read configuration file...
+            const json = General.readParam(req, "json", null);
+            const jsonTxt = fs.readFileSync(json, { encoding: "utf8" });
+            const jsonParsed = JSON.parse(jsonTxt);
+            const path = General.readParam(req, "path", null);
+            const configuration = SimpleObj.getValue(jsonParsed, path, null);
+            context.data.configuration = configuration;
+            collection = "configuration";
+        }
+        command.args = [action, db, collection];
+        const answer = await command.computation();
+        const response = {
+            args: command.args,
+            answer: answer,
+            status: "ok",
+        };
+        res.status(200).send(response);
     }
     static async ping(req, res, next) {
         const { client } = MilvusSrv.connect();
