@@ -4,6 +4,7 @@ import { encode, decode } from "@msgpack/msgpack";
 import { General } from "./common/General.mjs";
 import { CommandMilvus } from "@ejfdelgado/ejflab-common/src/flowchart/steps/CommandMilvus.js";
 import { SimpleObj } from "@ejfdelgado/ejflab-common/src/SimpleObj.js";
+import { MyError } from "./MyError.mjs";
 
 export class MilvusSrv {
     // MilvusSrv.checkErrors(res);
@@ -282,35 +283,50 @@ export class MilvusSrv {
             const buffer = req.body;
             const decoded = decode(buffer);
             // Connect to database
-            const {
+            let {
                 db_name,
                 collection_name,
                 embeed,
-                paging
+                paging,
+                search_params,
+                output_fields,
+                consistency_level,
             } = decoded;
             console.log(`Using database ${db_name}`);
             await MilvusSrv.useDatabase(client, db_name, false);
-            const search_params = {
-                "metric_type": "IP",
-                "topk": paging['limit'],
-                "params": JSON.stringify({ nprobe: 1024 }),
-            };
-            const results = await client.search({
+            if (!search_params) {
+                search_params = {
+                    "metric_type": "IP",
+                    "topk": paging['limit'],// here is redundant!
+                    "params": JSON.stringify({ nprobe: 1024 }),
+                };
+            }
+            if (!output_fields) {
+                output_fields = ['id', 'document_id', 'face_path', 'millis', 'x1', 'y1', 'x2', 'y2', 'ref_id'];
+            }
+            if (!consistency_level) {
+                consistency_level = "Strong";
+            }
+            const searchPayload = {
                 collection_name: collection_name,
-                data: [embeed],
+                data: [embeed],//??
                 limit: paging['limit'],
                 offset: paging['offset'],
-                consistency_level: "Strong",
+                consistency_level: consistency_level,
                 search_params: search_params,
-                output_fields: ['id', 'document_id', 'face_path', 'millis', 'x1', 'y1', 'x2', 'y2', 'ref_id']
-            });
-            response.results = results.results.map((entity) => {
+                output_fields: output_fields
+            };
+            const results = await client.search(searchPayload);
+            if (results.status.code != 0) {
+                throw new MyError(results.status.error_code+". "+results.status.reason)
+            }
+            response.results = [results.results.map((entity) => {
                 return {
                     id: entity.id,
                     distance: 0,
                     entity
                 };
-            });
+            })];
         } catch (err) {
             console.log(err);
             code = 500;
