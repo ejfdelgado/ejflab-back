@@ -35,6 +35,9 @@ import { OpenVideoChatProcessor } from "./callprocessors/OpenVideoChatProcessor.
 import { CloseVideoChatProcessor } from "./callprocessors/CloseVideoChatProcessor.mjs";
 import { IncludeOtherPeersProcessor } from "./callprocessors/IncludeOtherPeersProcessor.mjs";
 
+import fs from "fs";
+import stream from "stream";
+
 export class SocketIOCall {
     static io;
     static mutex = new Mutex();
@@ -417,7 +420,7 @@ export class SocketIOCall {
             decoded = decode(buffer);
         }
         //console.log(decoded);
-        const { processorMethod, room, channel } = decoded;
+        const { processorMethod, room, channel, data } = decoded;
         const parts = /(^[^\d\.]+)(\d*)\.(.*)$/.exec(processorMethod);
         if (!parts) {
             throw Error(`processorMethod ${processorMethod} does not matches /(^[^\d\.]+)(\d*)\.(.*)$/`);
@@ -490,17 +493,64 @@ export class SocketIOCall {
             const encoded = encode(decoded);
             const buffer = Buffer.from(encoded);
             console.log(`POST to ${postUrl}...`);
-            const temp = await axios.post(`${postUrl}/syncprocess`, buffer, options);
+            let isStream = false;
+            if (decoded.data?.streaming) {
+                isStream = true;
+                options['responseType'] = 'stream';
+                console.log("Prepare to receive streaming...");
+            }
+            const fullUrl = `${postUrl}/syncprocess`;
+            console.log(fullUrl);
+            const temp = await axios.post(fullUrl, buffer, options);
             console.log(`POST to ${postUrl}... OK!`);
-            promesa = Promise.resolve({ data: temp.data });
+            //console.log('Response status:', temp.status);
+            //console.log('Response headers:', temp.headers);
+            promesa = Promise.resolve({ data: temp.data, isStream });
         }
 
-
         const respuesta = await promesa;
-        res.status(200).send({
-            status: "ok",
-            response: respuesta
-        });
+        if (!respuesta.isStream) {
+            res.status(200).send({
+                status: "ok",
+                response: respuesta
+            });
+        } else {
+
+            res.status(200);
+            res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+            res.setHeader('Transfer-Encoding', 'chunked');
+
+            const pass = new stream.PassThrough();
+            pass.on('data', (temp) => {
+                console.log(temp);
+                //res.write(Buffer.from(`${temp.length.toString(16)}\r\n`, 'utf8'));
+                res.write(temp);
+                //res.flush();
+                //res.socket.write('');
+                //res.write(Buffer.from("\r\n", 'utf8'));
+            }).on("error", (error) => {
+                console.log(error);
+                //res.write(Buffer.from("0\r\n\r\n", 'utf8'));
+                res.end();
+            }).on("finish", () => {
+                console.log("finish");
+                //res.write(Buffer.from("0\r\n\r\n", 'utf8'));
+                res.end();
+            });
+            stream.pipeline(
+                respuesta.data,
+                pass,
+                (err) => {}
+            );
+
+            /*
+            stream.pipeline(
+                respuesta.data,
+                res,
+                (err) => {}
+            );
+            */
+        }
     }
 
     static async introspect(req, res, next) {
