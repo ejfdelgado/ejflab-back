@@ -35,7 +35,6 @@ import { OpenVideoChatProcessor } from "./callprocessors/OpenVideoChatProcessor.
 import { CloseVideoChatProcessor } from "./callprocessors/CloseVideoChatProcessor.mjs";
 import { IncludeOtherPeersProcessor } from "./callprocessors/IncludeOtherPeersProcessor.mjs";
 
-import fs from "fs";
 import stream from "stream";
 
 export class SocketIOCall {
@@ -517,39 +516,23 @@ export class SocketIOCall {
         } else {
 
             res.status(200);
-            res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+            res.setHeader('Content-Type', 'text/plain; charset=UTF-8');
             res.setHeader('Transfer-Encoding', 'chunked');
 
             const pass = new stream.PassThrough();
             pass.on('data', (temp) => {
-                console.log(temp);
-                //res.write(Buffer.from(`${temp.length.toString(16)}\r\n`, 'utf8'));
                 res.write(temp);
-                //res.flush();
-                //res.socket.write('');
-                //res.write(Buffer.from("\r\n", 'utf8'));
+                res.flush();
             }).on("error", (error) => {
-                console.log(error);
-                //res.write(Buffer.from("0\r\n\r\n", 'utf8'));
                 res.end();
             }).on("finish", () => {
-                console.log("finish");
-                //res.write(Buffer.from("0\r\n\r\n", 'utf8'));
                 res.end();
             });
             stream.pipeline(
                 respuesta.data,
                 pass,
-                (err) => {}
+                (err) => { }
             );
-
-            /*
-            stream.pipeline(
-                respuesta.data,
-                res,
-                (err) => {}
-            );
-            */
         }
     }
 
