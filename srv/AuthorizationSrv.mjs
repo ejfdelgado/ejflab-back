@@ -140,6 +140,58 @@ export class AuthorizationSrv {
         });
     }
 
+    static isUserInGroupInternal(user, groups, and) {
+        if (!user) {
+            return false;
+        }
+        const currentGroups = user.groups;
+        const notMeet = groups.filter((group) => {
+            if (currentGroups.indexOf(group) >= 0) {
+                return false;
+            }
+            return true;
+        });
+        if (and) {
+            //All must have
+            return notMeet.length == 0;
+        } else {
+            // At least one
+            return notMeet.length < groups.length;
+        }
+    }
+
+    static isUserInAllGroup(groups) {
+        return async (req, res, next) => {
+            if (res.locals.user) {
+                // Hay usuario
+                const cumple = this.isUserInGroupInternal(res.locals.user, groups, true);
+                if (cumple) {
+                    next();
+                } else {
+                    res.status(403).send({ message: `User not allowed` });
+                }
+            } else {
+                res.status(403).send({ message: `User not authenticated` });
+            }
+        }
+    }
+
+    static isUserInSomeGroup(groups) {
+        return async (req, res, next) => {
+            if (res.locals.user) {
+                // Hay usuario
+                const cumple = this.isUserInGroupInternal(res.locals.user, groups, false);
+                if (cumple) {
+                    next();
+                } else {
+                    res.status(403).send({ message: `User not allowed` });
+                }
+            } else {
+                res.status(403).send({ message: `User not authenticated` });
+            }
+        }
+    }
+
     static hasPagePermisions(listaOr) {
         return async (req, res, next) => {
             if (listaOr.length == 0) {

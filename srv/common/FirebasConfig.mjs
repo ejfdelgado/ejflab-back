@@ -5,6 +5,48 @@ import { Usuario } from './Usuario.mjs';
 import fs from "fs";
 import { General } from './General.mjs';
 import { MyConstants } from '@ejfdelgado/ejflab-common/src/MyConstants.js';
+import jwt from 'jsonwebtoken';
+import jwksClient from 'jwks-rsa';
+
+const AUTH_PROVIDER = process.env.AUTH_PROVIDER;
+const MICROSOFT_CLIENT_ID = process.env.MICROSOFT_CLIENT_ID;
+const MICROSOFT_TENANT = process.env.MICROSOFT_TENANT;
+
+const microsoftClient = jwksClient({
+    jwksUri: `https://login.microsoftonline.com/${MICROSOFT_TENANT}/discovery/v2.0/keys`,
+});
+
+// Helper to get the signing key
+function getMicrosoftKey(header, callback) {
+    microsoftClient.getSigningKey(header.kid, (err, key) => {
+        if (err) {
+            return callback(err);
+        }
+        const signingKey = key.getPublicKey();
+        callback(null, signingKey);
+    });
+}
+
+function verifyMicrosoftToken(token) {
+    return new Promise((resolve, reject) => {
+        jwt.verify(
+            token,
+            getMicrosoftKey,
+            {
+                algorithms: ['RS256'], // Tokens are typically signed with RS256
+                audience: MICROSOFT_CLIENT_ID, // Replace with your application's client ID
+                issuer: `https://login.microsoftonline.com/${MICROSOFT_TENANT}/v2.0`, // Replace with your tenant's issuer
+                //issuer: `https://sts.windows.net/${MICROSOFT_TENANT}/`
+            },
+            (err, decoded) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(decoded);
+            }
+        );
+    });
+}
 
 function getFirebaseConfig() {
     const firebaseJson = fs.readFileSync(MyConstants.FIREBASE_CONFIG_FILE, { encoding: "utf8" });
@@ -54,17 +96,30 @@ async function checkAutenticated(req) {
             reject(new MyError("Missing Authorization header.", 403));
             return;
         }
-        getAuth()
-            .verifyIdToken(sessionToken)
-            .then((decodedToken) => {
-                resolve({
-                    decodedToken,
-                    sessionToken,
+        if (AUTH_PROVIDER == "microsoft") {
+            verifyMicrosoftToken(sessionToken)
+                .then((decodedToken) => {
+                    resolve({
+                        decodedToken,
+                        sessionToken,
+                    });
+                })
+                .catch((error) => {
+                    reject(new MyError(error.message, 403));
                 });
-            })
-            .catch((error) => {
-                reject(new MyError(error.message, 403));
-            });
+        } else if (AUTH_PROVIDER == "google") {
+            getAuth()
+                .verifyIdToken(sessionToken)
+                .then((decodedToken) => {
+                    resolve({
+                        decodedToken,
+                        sessionToken,
+                    });
+                })
+                .catch((error) => {
+                    reject(new MyError(error.message, 403));
+                });
+        }
     });
 }
 
@@ -107,7 +162,7 @@ async function checkAuthenticatedSilent(req, res, next) {
         res.locals.user = new Usuario(res.locals.token);
         await next();
     } catch (err) {
-        //console.log(err);
+        console.log(err);
         res.locals.token = null;
         res.locals.user = null;
         await next();

@@ -5,6 +5,8 @@ import { MyStore } from "./MyStore.mjs";
 import { General } from "./General.mjs";
 import { MalaPeticionException } from "../MyError.mjs";
 
+const AUTH_PROVIDER = process.env.AUTH_PROVIDER;
+const groupIdMap = JSON.parse("AUTH_GROUP_ID_MAP" in process.env ? process.env.AUTH_GROUP_ID_MAP : "{}");
 const USER_TYPE = "user";
 
 export class Usuario {
@@ -12,20 +14,39 @@ export class Usuario {
     id = null;
     email = null;
     phone = null;
+    groups = [];
     constructor(token) {
         this.metadatos = token;
         if (this.metadatos != null) {
             if (this.metadatos.email) {
                 this.email = this.metadatos.email;
             }
-            const contenedor = this.metadatos["firebase"];
-            const identidades = contenedor["identities"];
-            if ("email" in identidades) {
-                this.id = identidades["email"][0];
-                this.email = this.id;
-            } else if ("phone" in identidades) {
-                this.id = identidades["phone"][0];
-                this.phone = this.id;
+            if (AUTH_PROVIDER == "microsoft") {
+                this.id = token.oid;
+                this.email = token.preferred_username;
+                if (token.groups instanceof Array) {
+                    this.groups = token.groups.map((idGroup) => {
+                        if (idGroup in groupIdMap) {
+                            return groupIdMap[idGroup];
+                        }
+                        return idGroup;
+                    });
+                }
+                //console.log(`id: ${this.id}`);
+                //console.log(`email: ${this.email}`);
+                //console.log(`groups: ${JSON.stringify(this.groups)}`);
+            } else {
+                if ("firebase" in this.metadatos) {
+                    const contenedor = this.metadatos["firebase"];
+                    const identidades = contenedor["identities"];
+                    if ("email" in identidades) {
+                        this.id = identidades["email"][0];
+                        this.email = this.id;
+                    } else if ("phone" in identidades) {
+                        this.id = identidades["phone"][0];
+                        this.phone = this.id;
+                    }
+                }
             }
         }
     }
