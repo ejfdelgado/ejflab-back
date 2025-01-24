@@ -4,9 +4,10 @@ import { MyConstants } from "@ejfdelgado/ejflab-common/src/MyConstants.js";
 import { MyStore } from "./MyStore.mjs";
 import { General } from "./General.mjs";
 import { MalaPeticionException } from "../MyError.mjs";
+import { Buffer } from 'buffer';
 
 const AUTH_PROVIDER = process.env.AUTH_PROVIDER;
-const groupIdMap = JSON.parse("AUTH_GROUP_ID_MAP" in process.env ? process.env.AUTH_GROUP_ID_MAP : "{}");
+const groupIdMap = JSON.parse("AUTH_GROUP_ID_MAP" in process.env ? Buffer.from(process.env.AUTH_GROUP_ID_MAP, 'base64').toString("utf8") : "{}");
 const USER_TYPE = "user";
 
 export class Usuario {
