@@ -25,6 +25,9 @@ export class Usuario {
             if (AUTH_PROVIDER == "microsoft") {
                 this.id = token.oid;
                 this.email = token.preferred_username;
+                if (this.email) {
+                    this.email = this.email.toLocaleLowerCase();
+                }
                 if (token.groups instanceof Array) {
                     this.groups = token.groups.map((idGroup) => {
                         if (idGroup in groupIdMap) {
