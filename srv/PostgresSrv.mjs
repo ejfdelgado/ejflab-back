@@ -28,6 +28,14 @@ export class PostgresSrv {
             }
             return bigNumber;
         });
+        types.setTypeParser(types.builtins.BIT, function (val) {
+            const myBit = parseInt(val);
+            if (isNaN(myBit)) {
+                // Fallback...
+                return null;
+            }
+            return myBit;
+        });
     }
     static noQuotes(val, ...args) {
         return val.replace(/'/g, "''");

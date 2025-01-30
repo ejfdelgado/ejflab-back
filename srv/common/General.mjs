@@ -1,6 +1,9 @@
 import md5 from 'md5';
 
 export class General {
+    static PAGE_SIZE_DEFAULT = "20";
+    static PAGE_DIRECTION = "DESC";
+    static DIRECTION_CHOICES = ["asc", "desc"];
     static readMaxOffset(req, MAX_READ_SIZE) {
         const offsetR = parseInt(General.readParam(req, "offset"));
         const maxR = parseInt(General.readParam(req, "max"));
@@ -64,6 +67,29 @@ export class General {
             millis: ('00' + ahora.getMilliseconds()).slice(-3),
             epoch: epochText,
             hash: md5(epochText),
+        };
+    }
+
+    static getPaginationArguments(req, orderColumnDef = null) {
+        const limit = parseInt(General.readParam(req, "limit", General.PAGE_SIZE_DEFAULT));
+        const orderColumn = General.readParam(req, "orderColumn", orderColumnDef);
+        const direction = General.readParam(req, "direction", General.PAGE_DIRECTION).toLowerCase();
+        const page = parseInt(General.readParam(req, "page", "0"));
+        if (!(typeof limit == "number")) {
+            throw new MalaPeticionException("limit is expected to be a number");
+        }
+        if (!(typeof page == "number")) {
+            throw new MalaPeticionException("page is expected to be a number");
+        }
+        if (General.DIRECTION_CHOICES.indexOf(direction) < 0) {
+            throw new MalaPeticionException(`direction is expected to be one of ${General.DIRECTION_CHOICES.join(', ')}`);
+        }
+        return {
+            limit,
+            orderColumn,
+            direction,
+            page,
+            offset: page * limit
         };
     }
 }
