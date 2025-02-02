@@ -74,12 +74,13 @@ export class General {
         const limit = parseInt(General.readParam(req, "limit", General.PAGE_SIZE_DEFAULT));
         const orderColumn = General.readParam(req, "orderColumn", orderColumnDef);
         const direction = General.readParam(req, "direction", General.PAGE_DIRECTION).toLowerCase();
-        const page = parseInt(General.readParam(req, "page", "0"));
+        const page = parseInt(General.readParam(req, "page", null));
+        const offsetProvided = parseInt(General.readParam(req, "offset", null));
         if (!(typeof limit == "number")) {
             throw new MalaPeticionException("limit is expected to be a number");
         }
-        if (!(typeof page == "number")) {
-            throw new MalaPeticionException("page is expected to be a number");
+        if (isNaN(page) && isNaN(offsetProvided)) {
+            throw new MalaPeticionException("page or offset is expected to be a number");
         }
         if (General.DIRECTION_CHOICES.indexOf(direction) < 0) {
             throw new MalaPeticionException(`direction is expected to be one of ${General.DIRECTION_CHOICES.join(', ')}`);
@@ -89,7 +90,7 @@ export class General {
             orderColumn,
             direction,
             page,
-            offset: page * limit
+            offset: !isNaN(offsetProvided) ? offsetProvided : page * limit
         };
     }
 }
