@@ -4,7 +4,7 @@ import { General } from "./common/General.mjs";
 import { MyTemplate } from "@ejfdelgado/ejflab-common/src/MyTemplate.js";
 import { CsvFormatterFilters } from "@ejfdelgado/ejflab-common/src/CsvFormatterFilters.js";
 import { MyUtilities } from '@ejfdelgado/ejflab-common/src/MyUtilities.js';
-import { MyDatesBack } from '@ejfdelgado/ejflab-common/src/MyDatesBack.mjs';
+import MyDatesBack from '@ejfdelgado/ejflab-common/src/MyDatesBack.mjs';
 
 export class MyPdf {
     static async localRender(template, model = {}, format = "pdf", extra = [], configuration, launch) {
