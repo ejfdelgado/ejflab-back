@@ -4,15 +4,21 @@ import { General } from "./common/General.mjs";
 import { MyTemplate } from "@ejfdelgado/ejflab-common/src/MyTemplate.js";
 import { CsvFormatterFilters } from "@ejfdelgado/ejflab-common/src/CsvFormatterFilters.js";
 import { MyUtilities } from '@ejfdelgado/ejflab-common/src/MyUtilities.js';
+import { MyDatesBack } from '@ejfdelgado/ejflab-common/src/MyDatesBack.mjs';
 
 export class MyPdf {
-    static async localRender(template, model = {}, format = "pdf", extra = []) {
+    static async localRender(template, model = {}, format = "pdf", extra = [], configuration, launch) {
         const source = fs.readFileSync(`./src/assets/templates/pdf/${template}`, { encoding: "utf8" });
+        if (!model.extra) {
+            model.extra = {};
+        }
+        const renderer = new MyTemplate();
+        renderer.registerFunction("json", CsvFormatterFilters.json);
+        renderer.registerFunction("epoch2date", (value, ...args) => {
+            return MyDatesBack.formatDateCompleto(new Date(value), ...args);
+        });
         for (let i = 0; i < extra.length; i++) {
             const extraFile = extra[i];
-            if (!model.extra) {
-                model.extra = {};
-            }
             const path = MyUtilities.removeRepeatedSlash(`./src/assets/templates/pdf/${extraFile.path}`);
             const exists = fs.existsSync(path);
             if (exists) {
@@ -21,36 +27,64 @@ export class MyPdf {
                     const base64String = data.toString('base64');
                     model.extra[extraFile.alias] = "base64," + base64String;
                 } else {
+                    // It is used as text
                     const text = fs.readFileSync(path, { encoding: "utf8" });
-                    model.extra[extraFile.alias] = text;
+                    model.extra[extraFile.alias] = renderer.render(text, model);
                 }
             } else {
                 model.extra[extraFile.alias] = "";
             }
         }
-
-        const renderer = new MyTemplate();
-        renderer.registerFunction("json", CsvFormatterFilters.json);
         const rendered = renderer.render(source, model);
         if (format == "html") {
             return rendered;
         }
-        const browser = await puppeteer.launch({
-            headless: 'new',
-            executablePath: '/usr/bin/google-chrome',
-            args: [
-                "--no-sandbox",
-                "--disable-gpu",
-            ]
-        });
+        if (!launch) {
+            launch = {
+                headless: 'new',
+                executablePath: '/usr/bin/google-chrome',
+                args: [
+                    "--no-sandbox",
+                    "--disable-gpu",
+                ]
+            };
+        }
+        const browser = await puppeteer.launch(launch);
+        if (!configuration) {
+            configuration = {
+                margin: { top: '100px', right: '50px', bottom: '100px', left: '50px' },
+                printBackground: true,
+                format: 'letter',
+            }
+        }
+
+        let itHasHeaderOrFooter = false;
+        if (!configuration.headerTemplate) {
+            if (model.extra.header_html) {
+                configuration.headerTemplate = model.extra.header_html;
+                itHasHeaderOrFooter = true;
+            }
+        }
+        if (!configuration.footerTemplate) {
+            if (model.extra.footer_html) {
+                configuration.footerTemplate = model.extra.footer_html;
+                itHasHeaderOrFooter = true;
+            }
+        }
+        configuration.displayHeaderFooter = itHasHeaderOrFooter;
+        if (itHasHeaderOrFooter) {
+            if (!configuration.footerTemplate) {
+                configuration.footerTemplate = '';
+            }
+            if (!configuration.headerTemplate) {
+                configuration.headerTemplate = '';
+            }
+        }
+
         const page = await browser.newPage();
         await page.setContent(rendered);
         await page.emulateMediaType('print');
-        const pdf = await page.pdf({
-            margin: { top: '100px', right: '50px', bottom: '100px', left: '50px' },
-            printBackground: true,
-            format: 'letter',
-        });
+        const pdf = await page.pdf(configuration);
         await browser.close();
         return pdf;
     }
