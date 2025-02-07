@@ -30,6 +30,8 @@ export class General {
             return req.query[nameLower];
         } else if (req.params && name in req.params) {
             return req.params[name];
+        } else if (req.params && nameLower in req.params) {
+            return req.params[nameLower];
         } else if (req.locals?.extra) {
             if (name in req.locals.extra) {
                 return req.locals.extra[name];
