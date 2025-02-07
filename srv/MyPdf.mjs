@@ -29,7 +29,11 @@ export class MyPdf {
                 } else {
                     // It is used as text
                     const text = fs.readFileSync(path, { encoding: "utf8" });
-                    model.extra[extraFile.alias] = renderer.render(text, model);
+                    if (extraFile.interpolate) {
+                        model.extra[extraFile.alias] = renderer.render(text, model);
+                    } else {
+                        model.extra[extraFile.alias] = text;
+                    }
                 }
             } else {
                 model.extra[extraFile.alias] = "";
