@@ -162,7 +162,6 @@ async function checkAuthenticatedSilent(req, res, next) {
         res.locals.user = new Usuario(res.locals.token);
         await next();
     } catch (err) {
-        console.log(err);
         res.locals.token = null;
         res.locals.user = null;
         await next();
