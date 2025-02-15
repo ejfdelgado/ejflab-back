@@ -7,7 +7,12 @@ import { MalaPeticionException } from "../MyError.mjs";
 import { Buffer } from 'buffer';
 
 const AUTH_PROVIDER = process.env.AUTH_PROVIDER;
-const groupIdMap = JSON.parse("AUTH_GROUP_ID_MAP" in process.env ? Buffer.from(process.env.AUTH_GROUP_ID_MAP, 'base64').toString("utf8") : "{}");
+let groupIdMap = {}
+try {
+    groupIdMap = JSON.parse("AUTH_GROUP_ID_MAP" in process.env ? Buffer.from(process.env.AUTH_GROUP_ID_MAP, 'base64').toString("utf8") : "{}");
+} catch (err) {
+    console.log(err);
+}
 const USER_TYPE = "user";
 
 export class Usuario {
