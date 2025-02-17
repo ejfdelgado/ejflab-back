@@ -5,6 +5,7 @@ import { MyTemplate } from "@ejfdelgado/ejflab-common/src/MyTemplate.js";
 import { CsvFormatterFilters } from "@ejfdelgado/ejflab-common/src/CsvFormatterFilters.js";
 import { MyUtilities } from '@ejfdelgado/ejflab-common/src/MyUtilities.js';
 import MyDatesBack from '@ejfdelgado/ejflab-common/src/MyDatesBack.mjs';
+import { TranslateSrv } from "./TranslateSrv.mjs";
 
 export class MyPdf {
     static async localRender(template, model = {}, format = "pdf", extra = [], configuration, launch) {
@@ -16,6 +17,18 @@ export class MyPdf {
         renderer.registerFunction("json", CsvFormatterFilters.json);
         renderer.registerFunction("epoch2date", (value, ...args) => {
             return MyDatesBack.formatDateCompleto(new Date(value), ...args);
+        });
+        renderer.registerFunction("age", (value, ...args) => {
+            const model = MyDatesBack.age(value);
+            let level = typeof (args[1]) == "number" ? args[1] : 0;
+            if ([0, 1, 2].indexOf(level) < 0) {
+                level = 0;
+            }
+            const folderName = args[0];
+            return TranslateSrv.translate(`pipes.age.${level}`, [folderName, model], 'en');
+        });
+        renderer.registerFunction("translate", (value, ...args) => {
+            return TranslateSrv.translate(value, args, 'en');
         });
         for (let i = 0; i < extra.length; i++) {
             const extraFile = extra[i];
