@@ -49,6 +49,7 @@ export class MyPdf {
                     }
                 }
             } else {
+                console.log(`Doesn't exits ${path}`);
                 model.extra[extraFile.alias] = "";
             }
         }
