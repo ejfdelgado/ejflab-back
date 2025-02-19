@@ -10,7 +10,8 @@ import { ModuloDatoSeguroBack } from "@ejfdelgado/ejflab-common/src/ModuloDatoSe
 import { MyConstants } from "@ejfdelgado/ejflab-common/src/MyConstants.js";
 
 export class MainHandler {
-    static LOCAL_FOLDER = path.resolve() + "/dist/bundle";
+    static LOCAL_FOLDER1 = path.resolve() + "/src";// First try
+    static LOCAL_FOLDER = path.resolve() + "/dist/bundle";// Finall try
     static async handle(req, res, next) {
         const originalUrl = req.getUrl();
         const theUrl = url.parse(originalUrl);
@@ -97,37 +98,54 @@ export class MainHandler {
         return null;
     }
 
-    static async resolveLocalFileSingle(filename, encoding, rootFolder = MainHandler.LOCAL_FOLDER) {
+    static async resolveLocalFileSingle(filename, encoding, rootFolder) {
         return new Promise((resolve, reject) => {
-            const somePath = path.join(rootFolder, filename);
 
-            fs.access(somePath, (err) => {
-                if (err) {
-                    resolve(null);
-                } else {
-                    if (!fs.lstatSync(somePath).isFile()) {
-                        resolve(null);
+            // Try
+            const options = [];
+            if (rootFolder) {
+                options.push(path.join(rootFolder, filename));
+            }
+            options.push(path.join(MainHandler.LOCAL_FOLDER1, filename));
+            options.push(path.join(MainHandler.LOCAL_FOLDER, filename));
+
+            // Check which exists first, if not resolve null with log
+            let selected = null;
+            for (let i = 0; i < options.length; i++) {
+                const actual = options[i];
+                if (fs.existsSync(actual)) {
+                    selected = actual;
+                    break;
+                }
+            }
+
+            if (!selected) {
+                console.log(`Files not found ${options}`);
+                resolve(null);
+            }
+
+            const somePath = selected;
+            if (!fs.lstatSync(somePath).isFile()) {
+                resolve(null);
+                return;
+            }
+            if (typeof encoding == "string") {
+                fs.readFile(somePath, encoding, function (err, data) {
+                    if (err) {
+                        reject(err);
                         return;
                     }
-                    if (typeof encoding == "string") {
-                        fs.readFile(somePath, encoding, function (err, data) {
-                            if (err) {
-                                reject(err);
-                                return;
-                            }
-                            resolve(data);
-                        });
-                    } else {
-                        fs.readFile(somePath, function (err, data) {
-                            if (err) {
-                                reject(err);
-                                return;
-                            }
-                            resolve(data);
-                        });
+                    resolve(data);
+                });
+            } else {
+                fs.readFile(somePath, function (err, data) {
+                    if (err) {
+                        reject(err);
+                        return;
                     }
-                }
-            });
+                    resolve(data);
+                });
+            }
         });
     }
 
