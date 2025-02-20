@@ -85,7 +85,7 @@ export class PostgresSrv {
     }
 
     static async executeTextInTransaction(sql, model = {}) {
-        const pool = PostgresSrv.getPool();
+        const pool = await PostgresSrv.getPool();
         const client = await pool.connect();
         await client.query("BEGIN");
         try {
@@ -106,7 +106,7 @@ export class PostgresSrv {
         console.log(sqlRendered);
         let localClient = false;
         if (!client) {
-            const pool = PostgresSrv.getPool();
+            const pool = await PostgresSrv.getPool();
             localClient = true;
             client = await pool.connect();
         }
@@ -127,16 +127,26 @@ export class PostgresSrv {
         return await PostgresSrv.executeTextInTransaction(sql, model);
     }
 
-    static getPool() {
+    static createPool() {
+        const params = PostgresSrv.getConnectionParams();
+        PostgresSrv.pool = new Pool({
+            user: params.user,
+            password: params.password,
+            host: params.host,
+            port: params.port,
+            database: params.database,
+        });
+    }
+
+    static async getPool() {
         if (PostgresSrv.pool == null) {
-            const params = PostgresSrv.getConnectionParams();
-            PostgresSrv.pool = new Pool({
-                user: params.user,
-                password: params.password,
-                host: params.host,
-                port: params.port,
-                database: params.database,
-            });
+            PostgresSrv.createPool();
+        }
+        try {
+            await PostgresSrv.pool.query('SELECT 1;');
+        } catch (err) {
+            console.log(err);
+            PostgresSrv.createPool();
         }
         return PostgresSrv.pool;
     }

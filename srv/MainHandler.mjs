@@ -106,7 +106,9 @@ export class MainHandler {
             if (rootFolder) {
                 options.push(path.join(rootFolder, filename));
             }
-            options.push(path.join(MainHandler.LOCAL_FOLDER1, filename));
+            if (process.env.ENV != "pro") {
+                options.push(path.join(MainHandler.LOCAL_FOLDER1, filename));
+            }
             options.push(path.join(MainHandler.LOCAL_FOLDER, filename));
 
             // Check which exists first, if not resolve null with log
@@ -122,6 +124,7 @@ export class MainHandler {
             if (!selected) {
                 console.log(`Files not found ${options}`);
                 resolve(null);
+                return;
             }
 
             const somePath = selected;
