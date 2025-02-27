@@ -427,6 +427,9 @@ export class SocketIOCall {
         const processor = parts[1];
         const instance = parts[2];
         decoded['method'] = parts[3];
+        decoded['pig'] = {
+            now: new Date().getTime(),
+        };
 
         // Get socket destiny if channel is websocket
         let socketId = null;

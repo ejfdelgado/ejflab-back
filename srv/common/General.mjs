@@ -1,4 +1,5 @@
 import md5 from 'md5';
+import { MalaPeticionException } from '../MyError.mjs';
 
 export class General {
     static PAGE_SIZE_DEFAULT = "20";
