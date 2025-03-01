@@ -1,5 +1,5 @@
 import md5 from 'md5';
-import { MalaPeticionException } from '../MyError.mjs';
+import { MalaPeticionException, ParametrosIncompletosException } from '../MyError.mjs';
 
 export class General {
     static PAGE_SIZE_DEFAULT = "20";
@@ -21,7 +21,7 @@ export class General {
             offset,
         };
     }
-    static readParam(req, name, pred = null) {
+    static readParam(req, name, pred = null, complain = false) {
         const nameLower = name.toLowerCase();
         if (req.body && name in req.body) {
             return req.body[name];
@@ -37,6 +37,9 @@ export class General {
             if (name in req.locals.extra) {
                 return req.locals.extra[name];
             }
+        }
+        if (complain) {
+            throw new ParametrosIncompletosException(`Parameter not found but required: ${name}`);
         }
         return pred;
     }

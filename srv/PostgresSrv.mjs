@@ -8,6 +8,7 @@ export class PostgresSrv {
     static pool = null;
     static {
         PostgresSrv.renderer.registerFunction("noQuotes", PostgresSrv.noQuotes);
+        PostgresSrv.renderer.registerFunction("singleWord", PostgresSrv.singleWord);
         PostgresSrv.renderer.registerFunction("sanitizeNumber", PostgresSrv.sanitizeNumber);
         PostgresSrv.renderer.registerFunction("sanitizeText", PostgresSrv.sanitizeText);
         PostgresSrv.renderer.registerFunction("sanitizeTextNull", PostgresSrv.sanitizeTextNull);
@@ -39,6 +40,9 @@ export class PostgresSrv {
     }
     static noQuotes(val, ...args) {
         return val.replace(/'/g, "''");
+    }
+    static singleWord(val, ...args) {
+        return val.split(/\s+/g)[0];
     }
     static sanitizeText(val, ...args) {
         let text = val;
