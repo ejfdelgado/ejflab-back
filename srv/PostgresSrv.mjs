@@ -79,12 +79,14 @@ export class PostgresSrv {
         const database = process.env.POSTGRES_DB || "nogales";
         const user = process.env.POSTGRES_USER || "user";
         const password = process.env.POSTGRES_PASSWORD || "pass";
+        const timeout = process.env.POSTGRES_TIMEOUT || "2000";
         return {
             host,
             port,
             database,
             user,
             password,
+            timeout,
         };
     }
 
@@ -139,17 +141,25 @@ export class PostgresSrv {
             host: params.host,
             port: params.port,
             database: params.database,
+            connectionTimeoutMillis: parseInt(params.timeout),
         });
     }
 
-    static async getPool() {
+    static async checkSelect1() {
         if (PostgresSrv.pool == null) {
             PostgresSrv.createPool();
         }
         try {
             await PostgresSrv.pool.query('SELECT 1;');
+            return true;
         } catch (err) {
-            console.log(err);
+            return false;
+        }
+    }
+
+    static async getPool() {
+        const canSelect1 = await PostgresSrv.checkSelect1();
+        if (!canSelect1) {
             PostgresSrv.createPool();
         }
         return PostgresSrv.pool;
