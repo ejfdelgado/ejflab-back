@@ -39,9 +39,15 @@ export class PostgresSrv {
         });
     }
     static noQuotes(val, ...args) {
+        if ([null, undefined].indexOf(val) >= 0) {
+            return "NULL";
+        }
         return val.replace(/'/g, "''");
     }
     static singleWord(val, ...args) {
+        if ([null, undefined].indexOf(val) >= 0) {
+            return "NULL";
+        }
         return val.split(/\s+/g)[0];
     }
     static sanitizeText(val, ...args) {

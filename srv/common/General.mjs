@@ -1,5 +1,6 @@
 import md5 from 'md5';
 import { MalaPeticionException, ParametrosIncompletosException } from '../MyError.mjs';
+import { SimpleObj } from "@ejfdelgado/ejflab-common/src/SimpleObj.js";
 
 export class General {
     static PAGE_SIZE_DEFAULT = "20";
@@ -23,8 +24,9 @@ export class General {
     }
     static readParam(req, name, pred = null, complain = false) {
         const nameLower = name.toLowerCase();
-        if (req.body && name in req.body) {
-            return req.body[name];
+        const first = SimpleObj.getValue(req.body, name, undefined);
+        if (first !== undefined) {
+            return first;
         } else if (req.query && name in req.query) {
             return req.query[name];
         } else if (req.query && nameLower in req.query) {
