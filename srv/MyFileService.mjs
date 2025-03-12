@@ -2,7 +2,7 @@ import axios from "axios";
 import sharp from "sharp";
 import { Buffer } from 'buffer';
 import { Storage } from '@google-cloud/storage';
-import ReadableStreamClone from 'readable-stream-clone'
+import { ReadableStreamClone } from 'readable-stream-clone'
 import { MyConstants } from "@ejfdelgado/ejflab-common/src/MyConstants.js";
 import { General } from "./common/General.mjs";
 import { PassThrough } from "stream";
