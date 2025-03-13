@@ -1,6 +1,6 @@
 {
   "name": "@ejfdelgado/ejflab-back",
-  "version": "1.30.5",
+  "version": "1.30.6",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ejfdelgado/ejflab-back.git"
@@ -45,7 +45,6 @@
     "pg": "^8.13.0",
     "puppeteer": "^22.12.1",
     "readable-stream-clone": "1.0.0",
-    "rxfire": "^6.0.5",
     "serialize-error": "^11.0.3",
     "sharp": "^0.33.4",
     "socket.io": "^4.7.5",
