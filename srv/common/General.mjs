@@ -79,11 +79,23 @@ export class General {
     }
 
     static getPaginationArguments(req, orderColumnDef = null) {
-        const limit = parseInt(General.readParam(req, "limit", General.PAGE_SIZE_DEFAULT));
-        const orderColumn = General.readParam(req, "orderColumn", orderColumnDef);
-        const direction = General.readParam(req, "direction", General.PAGE_DIRECTION).toLowerCase();
-        const page = parseInt(General.readParam(req, "page", null));
-        const offsetProvided = parseInt(General.readParam(req, "offset", null));
+        let predefined = {
+            orderColumn: null,
+            limit: General.PAGE_SIZE_DEFAULT,
+            offset: null,
+            page: null,
+            direction: General.PAGE_DIRECTION
+        }
+        if (typeof orderColumnDef == "object") {
+            predefined = Object.assign(predefined, orderColumnDef);
+        } else if (typeof orderColumnDef == "string") {
+            predefined.orderColumn = orderColumnDef;
+        }
+        const limit = parseInt(General.readParam(req, "limit", predefined.limit));
+        const orderColumn = General.readParam(req, "orderColumn", predefined.orderColumn);
+        const direction = General.readParam(req, "direction", predefined.direction).toLowerCase();
+        const page = parseInt(General.readParam(req, "page", predefined.page));
+        const offsetProvided = parseInt(General.readParam(req, "offset", predefined.offset));
         if (!(typeof limit == "number")) {
             throw new MalaPeticionException("limit is expected to be a number");
         }
