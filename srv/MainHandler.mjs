@@ -15,8 +15,10 @@ export class MainHandler {
     static async handle(req, res, next) {
         const originalUrl = req.getUrl();
         const theUrl = url.parse(originalUrl);
-        if (theUrl.pathname == "/socket.io/") {
-            return next();
+        //console.log(`theUrl.pathname = ${theUrl.pathname}`);
+        if (theUrl.pathname == "/socket.io/" || theUrl.pathname.startsWith("/srv/")) {
+            //next(); // it can't call no one after then...
+            return;
         }
         const rutas = MainHandler.decodeUrl(theUrl);
         const encoding = req.query.encoding;
