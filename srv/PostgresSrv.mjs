@@ -45,10 +45,8 @@ export class PostgresSrv {
         return val.replace(/'/g, "''");
     }
     static singleWord(val, ...args) {
-        if ([null, undefined].indexOf(val) >= 0) {
-            return "NULL";
-        }
-        return val.split(/\s+/g)[0];
+        const text = PostgresSrv.sanitizeTextNull(val);
+        return text.split(/\s+/g)[0];
     }
     static sanitizeText(val, ...args) {
         let text = val;
@@ -67,7 +65,7 @@ export class PostgresSrv {
             return "NULL";
         }
         let text = PostgresSrv.noQuotes(`${val}`, args);
-        return "'" + text + "'";
+        return text;
     }
     static sanitizeNumber(val, ...args) {
         let myNumber = parseFloat(val);
