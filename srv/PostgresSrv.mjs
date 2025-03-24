@@ -147,6 +147,16 @@ export class PostgresSrv {
             database: params.database,
             connectionTimeoutMillis: parseInt(params.timeout),
         });
+        PostgresSrv.pool.on('error', (err) => {
+            // try reconnect given the tipe of error
+            console.log("-------------------------------------");
+            console.log("------------------ Handling error ---");
+            console.log("-------------------------------------");
+            console.log(JSON.stringify(err.message));
+            if (err.message == "read ETIMEDOUT") {
+                PostgresSrv.createPool();
+            }
+        });
     }
 
     static async checkSelect1() {
