@@ -1,6 +1,7 @@
 import pg from "pg";
 import fs from "fs";
 import { MyTemplate } from "@ejfdelgado/ejflab-common/src/MyTemplate.js";
+import { consoleSrv } from "./ConsoleSrv.mjs";
 const { Pool } = pg;
 
 export class PostgresSrv {
@@ -113,7 +114,7 @@ export class PostgresSrv {
 
     static async executeText(sql, model = {}, client = null) {
         const sqlRendered = PostgresSrv.renderer.render(sql, model);
-        console.log(sqlRendered);
+        consoleSrv.log(sqlRendered);
         let localClient = false;
         if (!client) {
             const pool = await PostgresSrv.getPool();
@@ -149,10 +150,10 @@ export class PostgresSrv {
         });
         PostgresSrv.pool.on('error', (err) => {
             // try reconnect given the tipe of error
-            console.log("-------------------------------------");
-            console.log("------------------ Handling error ---");
-            console.log("-------------------------------------");
-            console.log(JSON.stringify(err.message));
+            consoleSrv.error("-------------------------------------");
+            consoleSrv.error("------------------ Handling error ---");
+            consoleSrv.error("-------------------------------------");
+            consoleSrv.error(JSON.stringify(err.message));
             if (err.message == "read ETIMEDOUT") {
                 PostgresSrv.createPool();
             }
@@ -217,9 +218,9 @@ export class PostgresSrv {
                 throw new Error(`Test ${i + 1} In: ${actual.in} Actual: ${returned} but expected ${actual.expected}`);
             }
         }
-        console.log(`Test passed ${testsNumber.length}!`);
+        consoleSrv.log(`Test passed ${testsNumber.length}!`);
 
-        //console.log(PostgresSrv.renderer.render('Hola ${name} with age ${age | sanitizeNumber :  0}', {name: "Edgar", age: undefined}));
+        //consoleSrv.log(PostgresSrv.renderer.render('Hola ${name} with age ${age | sanitizeNumber :  0}', {name: "Edgar", age: undefined}));
     }
 }
 
