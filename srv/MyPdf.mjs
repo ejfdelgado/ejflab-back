@@ -7,6 +7,14 @@ import { MyUtilities } from '@ejfdelgado/ejflab-common/src/MyUtilities.js';
 import MyDatesBack from '@ejfdelgado/ejflab-common/src/MyDatesBack.mjs';
 import { TranslateSrv } from "./TranslateSrv.mjs";
 
+let executablePath = '/usr/bin/google-chrome';
+if (process.platform === 'win32') {
+    executablePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+}
+if (process.env.CHROME_PATH) {
+    executablePath = process.env.CHROME_PATH;
+}
+
 export class MyPdf {
     static async localRender(template, model = {}, format = "pdf", extra = [], configuration, launch) {
         const source = fs.readFileSync(`./src/assets/templates/pdf/${template}`, { encoding: "utf8" });
@@ -60,7 +68,7 @@ export class MyPdf {
         if (!launch) {
             launch = {
                 headless: 'new',
-                executablePath: '/usr/bin/google-chrome',
+                executablePath: executablePath,
                 args: [
                     "--no-sandbox",
                     "--disable-gpu",
