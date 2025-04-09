@@ -194,6 +194,11 @@ export class AuthorizationSrv {
 
     static hasPagePermisions(listaOr) {
         return async (req, res, next) => {
+            // bypass
+            if (process.env.BYPASS_PERMISSIONS == "yes") {
+                next();
+                return;
+            }
             if (listaOr.length == 0) {
                 next();
                 return;
