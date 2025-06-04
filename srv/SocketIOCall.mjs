@@ -386,6 +386,7 @@ export class SocketIOCall {
         this.hookProcessors = map;
     }
 
+    // SocketIOCall.disconnect
     static async disconnect(socket) {
         const headers = SocketIOCall.getCustomHeaders(socket);
         //socket.off();
@@ -393,6 +394,10 @@ export class SocketIOCall {
         await SocketIOCall.unregisterSocket(socket);
         SocketIOCall.io.to(headers.room).emit("removeUser", {
             socketId: socket.id
+        });
+        const room = headers.room;
+        SocketIOCall.io.to(room).emit("updateUserList", {
+            socketIds: SocketIOCall.mapSockets[room]
         });
     }
 
