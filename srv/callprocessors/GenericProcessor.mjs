@@ -9,7 +9,8 @@ export class GenericProcessor {
         try {
             await this.execute(payload);
         } catch (err) {
-            console.log(err);
+            //console.log(err);
+            console.log(err.message);
         }
     }
 }

@@ -48,6 +48,7 @@ export class SocketIOCall {
     static socketIdToSocket = {};
     static socketRoomUUIDMap = {};
     static socketToImage = {};
+    static hookProcessors = {};
 
     static echoLog(message) {
         console.log(message);
@@ -139,7 +140,7 @@ export class SocketIOCall {
     }
 
     static async registerSocket(socket) {
-        console.log("registerSocket...");
+        console.log("registerSocket...!");
         SocketIOCall.socketIdToSocket[socket.id] = socket;
         const headers = SocketIOCall.getCustomHeaders(socket);
         const room = headers.room;
@@ -162,6 +163,7 @@ export class SocketIOCall {
         if (typeof myUUID == "string" && myUUID !== "null") {
             SocketIOCall.socketRoomUUIDMap[room][myUUID] = socket.id;
         }
+        // Here creates the uuid mapping
         console.log(JSON.stringify(SocketIOCall.socketRoomUUIDMap, null, 4));
         release();
         console.log(`${socket.id} joins ${headers.room}`);
@@ -369,6 +371,19 @@ export class SocketIOCall {
             //SocketIOCall.echoLog(`${socket.id} sends includeOtherPeers with ${JSON.stringify(payload)}`);
             new IncludeOtherPeersProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
+
+        const extraHooks = Object.keys(SocketIOCall.hookProcessors);
+        for (let k = 0; k < extraHooks.length; k++) {
+            const hookId = extraHooks[k];
+            socket.on(hookId, (payload) => {
+                const className = SocketIOCall.hookProcessors[hookId];
+                new className(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
+            });
+        }
+    }
+
+    static registerHookProcessors(map) {
+        this.hookProcessors = map;
     }
 
     static async disconnect(socket) {
