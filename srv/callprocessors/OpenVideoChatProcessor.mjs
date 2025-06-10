@@ -12,6 +12,8 @@ export class OpenVideoChatProcessor extends GenericProcessor {
         const socketId = this.context.getSocketIdFromRoomAndUUID("public", args.uuid);
         this.io.to(socketId).emit("openVideoChat", {
             room: args.room,
+            providerName: args.providerName,
+            providerTitle: args.providerTitle,
         });
     }
 }
