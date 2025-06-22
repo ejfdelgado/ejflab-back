@@ -1,7 +1,6 @@
 import md5 from "md5";
 import { Buffer } from "buffer";
 import { MyError } from "./MyError.mjs";
-import { MyUtilities } from "@ejfdelgado/ejflab-common/src/MyUtilities.js";
 
 function stringify(circ) {
     var cache = [];
@@ -15,6 +14,26 @@ function stringify(circ) {
     cache = null;
     return text;
 };
+
+function corsCustomDomains(allowedOrigins = []) {
+    return (req, res, next) => {
+        const origin = req.headers.origin;
+        if (req.method == 'OPTIONS') {
+            if (allowedOrigins.includes(origin)) {
+                res.setHeader('Access-Control-Allow-Origin', origin);
+            }
+            res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE');
+            res.setHeader('Access-Control-Allow-Headers', '*');
+            res.setHeader('Access-Control-Max-Age', '3600');
+            res.status(204).send('');
+        } else {
+            if (allowedOrigins.includes(origin)) {
+                res.setHeader('Access-Control-Allow-Origin', origin);
+            }
+            next();
+        }
+    }
+}
 
 function cors(req, res, next) {
     if (req.method == 'OPTIONS') {
@@ -101,6 +120,7 @@ function handleErrorsDecorator(someFun) {
 
 export {
     cors,
+    corsCustomDomains,
     getEnvVariables,
     urlNorFound,
     commonHeaders,
