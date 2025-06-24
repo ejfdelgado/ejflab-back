@@ -8,7 +8,7 @@ export class AskIceServersProcessor extends GenericProcessor {
     execute(args) {
         // Reads from credentilas file...
         let confFile = process.env.WEBRTC_CONF || "./credentials/webrtcconfig.json";
-        if ("webrtc_conf" in args) {
+        if ("webrtc_conf" in args && typeof args["webrtc_conf"] == "string") {
             confFile = args["webrtc_conf"];
         }
         const text = fs.readFileSync(confFile, 'utf8');
