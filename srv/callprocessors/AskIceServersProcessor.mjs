@@ -7,7 +7,11 @@ export class AskIceServersProcessor extends GenericProcessor {
     }
     execute(args) {
         // Reads from credentilas file...
-        const text = fs.readFileSync(`./credentials/webrtcconfig.json`, 'utf8');
+        let confFile = process.env.WEBRTC_CONF || "./credentials/webrtcconfig.json";
+        if ("webrtc_conf" in args) {
+            confFile = args["webrtc_conf"];
+        }
+        const text = fs.readFileSync(confFile, 'utf8');
         const parsed = JSON.parse(text);
         this.io.to(this.socket.id).emit("oniceservers", parsed);
     }
