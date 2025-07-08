@@ -51,8 +51,10 @@ export class SocketIOCall {
     static hookProcessors = {};
 
     static echoLog(message) {
-        console.log(message);
-        SocketIOCall.io.emit('echoLog', { message });
+        if (process.env.ENV != "pro") {
+            console.log(message);
+            SocketIOCall.io.emit('echoLog', { message });
+        }
     }
 
     static setFlowChartExec(room, instance) {
