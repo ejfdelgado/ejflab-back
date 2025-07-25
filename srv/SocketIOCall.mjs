@@ -49,6 +49,7 @@ export class SocketIOCall {
     static socketRoomUUIDMap = {};
     static socketToImage = {};
     static hookProcessors = {};
+    static internalBus = new EventEmitter();
 
     static echoLog(message) {
         if (process.env.ENV != "pro") {
@@ -377,10 +378,14 @@ export class SocketIOCall {
         const extraHooks = Object.keys(SocketIOCall.hookProcessors);
         for (let k = 0; k < extraHooks.length; k++) {
             const hookId = extraHooks[k];
-            socket.on(hookId, (payload) => {
+            const commonCall = (payload) => {
                 const className = SocketIOCall.hookProcessors[hookId];
                 new className(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
-            });
+            };
+            socket.on(hookId, commonCall);
+            if (SocketIOCall.internalBus.listenerCount(hookId) == 0) {
+                SocketIOCall.internalBus.on(hookId, commonCall);
+            }
         }
     }
 

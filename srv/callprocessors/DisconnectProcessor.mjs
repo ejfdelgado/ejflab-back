@@ -17,11 +17,17 @@ export class DisconnectProcessor extends GenericProcessor {
         }
     }
 
-    clearPersonFromPeople(people, socketId) {
+    clearPersonFromPeople(people, socketId, room) {
         for (let personId in people) {
             const onePerson = people[personId];
             if (onePerson.socket == socketId || socketId == personId) {
-                delete people[personId]
+                if (onePerson.sharedState && onePerson.sharedState.user_id) {
+                    this.context.internalBus.emit("closeVideoChat", {
+                        provider: onePerson.sharedState.user_id,
+                        room: room,
+                    });
+                }
+                delete people[personId];
                 break;
             }
         }
@@ -43,7 +49,7 @@ export class DisconnectProcessor extends GenericProcessor {
         //
         const people = SimpleObj.getValue(roomData.model, "data.people", null);
         if (people) {
-            this.clearPersonFromPeople(people, socketId);
+            this.clearPersonFromPeople(people, socketId, room);
         }
 
         const observe = ["data", "data.state", "data.state.sources", "data.state.processors", "data.people"];
