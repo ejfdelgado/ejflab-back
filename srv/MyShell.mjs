@@ -4,6 +4,7 @@ import { spawn } from "child_process";
 import { General } from "./common/General.mjs";
 import { InesperadoException } from "./MyError.mjs";
 import { IdGen } from "@ejfdelgado/ejflab-common/src/IdGen.js";
+import { exec } from 'child_process';
 
 export class ExecFolder {
     constructor() {
@@ -129,11 +130,11 @@ export class MyShell {
             exec(command, {
                 cwd: workingDirectory
             }, function (err, stdout, stderr) {
-                console.log(stdout);
+                //console.log(stdout);
                 if (err !== null) {
                     reject(err);
                 } else {
-                    resolve();
+                    resolve({stdout, stderr});
                 }
             });
         });

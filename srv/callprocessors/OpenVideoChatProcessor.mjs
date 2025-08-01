@@ -14,6 +14,7 @@ export class OpenVideoChatProcessor extends GenericProcessor {
             room: args.room,
             providerName: args.providerName,
             providerTitle: args.providerTitle,
+            provider: args.provider,
         });
     }
 }
