@@ -27,6 +27,12 @@ export class DisconnectProcessor extends GenericProcessor {
                         room: room,
                     });
                 }
+                if (onePerson.sharedState && onePerson.sharedState.uuid) {
+                    this.context.internalBus.emit("soupClose", {
+                        uuid: onePerson.sharedState.uuid,
+                        room: room,
+                    });
+                }
                 delete people[personId];
                 break;
             }
