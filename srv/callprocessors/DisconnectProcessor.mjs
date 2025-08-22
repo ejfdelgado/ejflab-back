@@ -31,6 +31,7 @@ export class DisconnectProcessor extends GenericProcessor {
                     this.context.internalBus.emit("soupClose", {
                         uuid: onePerson.sharedState.uuid,
                         room: room,
+                        sharedState: onePerson.sharedState,
                     });
                 }
                 delete people[personId];
