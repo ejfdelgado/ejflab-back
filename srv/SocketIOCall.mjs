@@ -34,6 +34,8 @@ import { PostgresSrv } from "./PostgresSrv.mjs";
 import { OpenVideoChatProcessor } from "./callprocessors/OpenVideoChatProcessor.mjs";
 import { CloseVideoChatProcessor } from "./callprocessors/CloseVideoChatProcessor.mjs";
 import { IncludeOtherPeersProcessor } from "./callprocessors/IncludeOtherPeersProcessor.mjs";
+import { RegisterSessionProcessor } from "./callprocessors/RegisterSessionProcessor.mjs";
+import { UnregisterSessionProcessor } from "./callprocessors/UnregisterSessionProcessor.mjs";
 
 import stream from "stream";
 
@@ -50,6 +52,7 @@ export class SocketIOCall {
     static socketToImage = {};
     static hookProcessors = {};
     static internalBus = new EventEmitter();
+    static sessionsByProvider = {};
 
     static echoLog(message) {
         if (process.env.ENV != "pro") {
@@ -373,6 +376,14 @@ export class SocketIOCall {
         socket.on("includeOtherPeers", (payload) => {
             //SocketIOCall.echoLog(`${socket.id} sends includeOtherPeers with ${JSON.stringify(payload)}`);
             new IncludeOtherPeersProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
+        });
+        socket.on("registerSession", (payload) => {
+            //SocketIOCall.echoLog(`${socket.id} sends includeOtherPeers with ${JSON.stringify(payload)}`);
+            new RegisterSessionProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
+        });
+        socket.on("unregisterSession", (payload) => {
+            //SocketIOCall.echoLog(`${socket.id} sends includeOtherPeers with ${JSON.stringify(payload)}`);
+            new UnregisterSessionProcessor(SocketIOCall, SocketIOCall.io, socket).executeSave(payload);
         });
 
         const extraHooks = Object.keys(SocketIOCall.hookProcessors);

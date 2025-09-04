@@ -20,6 +20,19 @@ export class DisconnectProcessor extends GenericProcessor {
     clearPersonFromPeople(people, socketId, room) {
         for (let personId in people) {
             const onePerson = people[personId];
+            //console.log(room, JSON.stringify(onePerson));
+            if (room == "public") {
+                // public room control
+                const { type, user_id } = onePerson;
+                if (type == "provider") {
+                    // It's provider, then remove it from connected providers
+                    //console.log(`Register session end to ${user_id}`);
+                    this.context.internalBus.emit("unregisterSession", {
+                        provider: user_id,
+                        room: room,
+                    });
+                }
+            }
             if (onePerson.socket == socketId || socketId == personId) {
                 if (onePerson.sharedState && onePerson.sharedState.user_id) {
                     this.context.internalBus.emit("closeVideoChat", {
