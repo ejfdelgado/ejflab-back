@@ -29,7 +29,7 @@ export class DisconnectProcessor extends GenericProcessor {
                     //console.log(`Register session end to ${user_id}`);
                     this.context.internalBus.emit("unregisterSession", {
                         provider: user_id,
-                        room: room,
+                        socketId: socketId,
                     });
                 }
             }
