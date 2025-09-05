@@ -55,6 +55,7 @@ export class DisconnectProcessor extends GenericProcessor {
 
     async execute(args) {
         const socketId = this.socket.id;
+        console.log(`DisconnectProcessor "${socketId}"`);
         // Busco los sources
         const room = this.context.getRoomFromSocket(this.socket);
         const instance = await this.context.getFlowChartExec(room);

@@ -6,7 +6,7 @@ export class UnregisterSessionProcessor extends GenericProcessor {
         super(context, io, socket);
     }
     execute(args) {
-        //console.log(`UnregisterSessionProcessor... ${JSON.stringify(args)}`);
+        console.log(`UnregisterSessionProcessor... ${JSON.stringify(args)}`);
         const sessionsData = this.context.sessionsByProvider;
         const { socketId, provider } = args;
         if ((provider in sessionsData)) {
@@ -19,7 +19,7 @@ export class UnregisterSessionProcessor extends GenericProcessor {
                 delete sockets[socketId];
             }
         }
-        //console.log(JSON.stringify(sessionsData, null, 4));
+        console.log(JSON.stringify(sessionsData, null, 4));
         const allSockets = Object.keys(sessionsData[provider].sockets);
         const count = allSockets.length;
         for (let i = 0; i < allSockets.length; i++) {

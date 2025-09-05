@@ -6,7 +6,7 @@ export class RegisterSessionProcessor extends GenericProcessor {
         super(context, io, socket);
     }
     execute(args) {
-        //console.log(`RegisterSessionProcessor... ${JSON.stringify(args)}`);
+        console.log(`RegisterSessionProcessor... ${JSON.stringify(args)}`);
         const sessionsData = this.context.sessionsByProvider;
         const { socketId, sessionId, provider } = args;
         if (!(provider in sessionsData)) {
@@ -32,7 +32,7 @@ export class RegisterSessionProcessor extends GenericProcessor {
                 userSessions.sessions[sessionId] = socketId;
             }
         }
-        //console.log(JSON.stringify(sessionsData, null, 4));
+        console.log(JSON.stringify(sessionsData, null, 4));
         // Notify all sockets the amount of sessions
         const allSockets = Object.keys(sessionsData[provider].sockets);
         const count = allSockets.length;
