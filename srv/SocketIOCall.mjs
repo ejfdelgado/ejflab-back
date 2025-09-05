@@ -54,6 +54,41 @@ export class SocketIOCall {
     static internalBus = new EventEmitter();
     static sessionsByProvider = {};
 
+    static {
+        // check dead sockets
+        const cleanDeadSockets = () => {
+            for (let providerId in SocketIOCall.sessionsByProvider) {
+                const provider = SocketIOCall.sessionsByProvider[providerId];
+                const { sockets, sessions } = provider;
+                // Check the sockets
+                if (sockets) {
+                    const socketsIds = Object.keys(sockets);
+                    if (socketsIds.length > 0) {
+                        const deadSockets = socketsIds.map((socketId) => {
+                            const connected1 = !!(SocketIOCall.io.of("/").sockets.get(socketId));
+                            const connected2 = SocketIOCall.io.of("/").adapter.sids.has(socketId);
+                            return { connected1, connected2, socketId }
+                        }).filter((status) => {
+                            return !status.connected1 || !status.connected2;
+                        });
+                        //
+                        deadSockets.forEach((socketMap) => {
+                            const socketId = socketMap.socketId;
+                            console.log(`cleanDeadSockets: Forcing disconnect "${socketId}"...`);
+                            SocketIOCall.internalBus.emit("disconnect", {
+                                socketId: socketId,
+                            });
+                        });
+                    }
+                }
+            }
+        };
+
+        setInterval(() => {
+            cleanDeadSockets();
+        }, 4000);
+    }
+
     static echoLog(message) {
         if (process.env.ENV != "pro") {
             console.log(message);
