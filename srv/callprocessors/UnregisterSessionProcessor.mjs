@@ -18,6 +18,18 @@ export class UnregisterSessionProcessor extends GenericProcessor {
                 delete sessions[oldSession];
                 delete sockets[socketId];
             }
+        } else {
+            // Search in all providers the socketId
+            for (let providerTemp in sessionsData) {
+                const userSessions = sessionsData[providerTemp];
+                const { sockets, sessions } = userSessions;
+                // Get session by socketId
+                const oldSession = sockets[socketId];
+                if (oldSession) {
+                    delete sessions[oldSession];
+                    delete sockets[socketId];
+                }
+            }
         }
         console.log(JSON.stringify(sessionsData, null, 4));
         const allSockets = Object.keys(sessionsData[provider].sockets);
