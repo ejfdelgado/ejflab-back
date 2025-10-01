@@ -36,6 +36,7 @@ import { CloseVideoChatProcessor } from "./callprocessors/CloseVideoChatProcesso
 import { IncludeOtherPeersProcessor } from "./callprocessors/IncludeOtherPeersProcessor.mjs";
 import { RegisterSessionProcessor } from "./callprocessors/RegisterSessionProcessor.mjs";
 import { UnregisterSessionProcessor } from "./callprocessors/UnregisterSessionProcessor.mjs";
+import { General } from "./common/General.mjs";
 
 import stream from "stream";
 
@@ -53,6 +54,7 @@ export class SocketIOCall {
     static hookProcessors = {};
     static internalBus = new EventEmitter();
     static sessionsByProvider = {};
+    static attachedFiles = {};
 
     static {
         // check dead sockets
@@ -87,6 +89,14 @@ export class SocketIOCall {
         setInterval(() => {
             cleanDeadSockets();
         }, 4000);
+    }
+
+    static storeAttachedFile(id, byteArray, fileName, mimeType) {
+        SocketIOCall.attachedFiles[id] = {
+            byteArray,
+            fileName,
+            mimeType,
+        };
     }
 
     static echoLog(message) {
@@ -640,5 +650,24 @@ export class SocketIOCall {
 
     static getSocketImage(socketId) {
         return SocketIOCall.socketToImage[socketId];
+    }
+
+    static async getAttachedFile(req, res, next) {
+        const attachedId = General.readParam(req, "id", null, true);
+        const attachedData = SocketIOCall.attachedFiles[attachedId];
+        if (!attachedData) {
+            res.status(204).end();
+            return;
+        }
+        const { byteArray, fileName, mimeType } = attachedData;
+        const buffer = Buffer.from(byteArray);
+        const safeName = encodeURIComponent(fileName);
+        res.setHeader("Content-Disposition", `inline; filename=${safeName}`);
+        res.setHeader("Content-Type", mimeType);
+        res.setHeader("X-Frame-Options", "ALLOWALL");
+        res.setHeader("Content-Security-Policy", "frame-ancestors 'self' http://localhost:4200;");
+        res.setHeader("Permissions-Policy", "fullscreen=*");
+
+        res.send(buffer); // send raw bytes
     }
 }

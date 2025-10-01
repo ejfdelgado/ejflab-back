@@ -21,6 +21,7 @@ export class MainHandler {
             return;
         }
         const rutas = MainHandler.decodeUrl(theUrl);
+        const nopages = req.query.nopages == "1";
         const encoding = req.query.encoding;
         const rta = await MainHandler.resolveLocalFile(rutas, encoding);
         if (
@@ -29,7 +30,7 @@ export class MainHandler {
             rta.metadata.filename == "index.html"
         ) {
             const partes = MyRoutes.splitPageData(theUrl.path);
-            if (MyConstants.NO_AUTO_PAGE_NAVITATION.indexOf(partes.pageType) >= 0) {
+            if (MyConstants.NO_AUTO_PAGE_NAVITATION.indexOf(partes.pageType) >= 0 || nopages || process.env.NO_PAGES === "1") {
                 partes.pageId = null;
             }
             const replaces = await PageSrv.loadCurrentPage(partes.pageType, partes.pageId);

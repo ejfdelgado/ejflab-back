@@ -1,6 +1,6 @@
 import { SimpleObj } from "@ejfdelgado/ejflab-common/src/SimpleObj.js";
 import { GenericProcessor } from "./GenericProcessor.mjs";
-
+import { v4 as uuidv4 } from 'uuid';
 
 export class SendChatProcessor extends GenericProcessor {
     MAX_COUNT_TIMESTAMS = 6;
@@ -8,8 +8,14 @@ export class SendChatProcessor extends GenericProcessor {
         super(context, io, socket);
     }
     execute(args) {
-        const { text, author, open } = args;
+        const { text, author, open, bytes, fileName, mimeType } = args;
         const room = this.context.getRoomFromSocket(this.socket);
+        let attachedFileId = null;
+        if (bytes) {
+            attachedFileId = room + "_" + uuidv4().replace(/-/g, '_');
+            // Store the bytes using this idKey
+            this.context.storeAttachedFile(attachedFileId, bytes, fileName, mimeType);
+        }
         const roomData = this.context.getRoomLiveTupleModel(room);
         if (!roomData.model.data) {
             roomData.model.data = {};
@@ -18,13 +24,17 @@ export class SendChatProcessor extends GenericProcessor {
             roomData.model.data.chat = [];
         }
         const now = new Date().getTime();
-        roomData.model.data.chat.push({
+        const chatEntry = {
             text,
             date: now,
             author: {
                 uid: author,
             },
-        });
+        };
+        if (attachedFileId) {
+            chatEntry.attachedId = attachedFileId;
+        }
+        roomData.model.data.chat.push(chatEntry);
         let changes = roomData.builder.trackDifferences(roomData.model, [], null, ["data", "data.chat"]);
         roomData.model = roomData.builder.affect(changes);
         // Also notify last message time

@@ -113,7 +113,14 @@ export class PostgresSrv {
     }
 
     static async executeText(sql, model = {}, client = null) {
-        const sqlRendered = PostgresSrv.renderer.render(sql, model);
+        let sqlRendered = "";
+        if (typeof sql == "string") {
+            sqlRendered = PostgresSrv.renderer.render(sql, model);
+        } else if (sql instanceof Array) {
+            sqlRendered = sql.map((sqlText, index) => {
+                return PostgresSrv.renderer.render(sqlText, model[index]);
+            }).join("\n");
+        }
         consoleSrv.log(sqlRendered);
         let localClient = false;
         if (!client) {
@@ -129,13 +136,27 @@ export class PostgresSrv {
     }
 
     static async executeFile(path, model = {}, client = null) {
-        const sql = fs.readFileSync(path, "utf-8");
-        return await PostgresSrv.executeText(sql, model, client);
+        if (typeof path == "string") {
+            const sql = fs.readFileSync(path, "utf-8");
+            return await PostgresSrv.executeText(sql, model, client);
+        } else if (path instanceof Array) {
+            const plainSqlArray = path.map((singlePath) => {
+                return fs.readFileSync(singlePath, "utf-8");
+            });
+            return await PostgresSrv.executeText(plainSqlArray, model, client);
+        }
     }
 
     static async executeFileInTransaction(path, model = {}) {
-        const sql = fs.readFileSync(path, "utf-8");
-        return await PostgresSrv.executeTextInTransaction(sql, model);
+        if (typeof path == "string") {
+            const sql = fs.readFileSync(path, "utf-8");
+            return await PostgresSrv.executeTextInTransaction(sql, model);
+        } else if (path instanceof Array) {
+            const plainSqlArray = path.map((singlePath) => {
+                return fs.readFileSync(singlePath, "utf-8");
+            });
+            return await PostgresSrv.executeTextInTransaction(plainSqlArray, model);
+        }
     }
 
     static createPool() {
