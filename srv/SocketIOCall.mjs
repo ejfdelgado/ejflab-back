@@ -695,7 +695,7 @@ export class SocketIOCall {
             room,
         };
 
-        await new SendChatProcessor(SocketIOCall, SocketIOCall.io, socketId).executeSave(payload);
+        await new SendChatProcessor(SocketIOCall, SocketIOCall.io, { id: socketId }).executeSave(payload);
         res.status(200).send(response);
     }
 }
