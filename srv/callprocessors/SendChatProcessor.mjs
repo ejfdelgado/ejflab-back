@@ -9,7 +9,15 @@ export class SendChatProcessor extends GenericProcessor {
     }
     execute(args) {
         const { text, author, open, bytes, fileName, mimeType } = args;
-        const room = this.context.getRoomFromSocket(this.socket);
+        let room = this.context.getRoomFromSocket(this.socket);
+        if (!room) {
+            if (args.room) {
+                room = args.room;
+            } else {
+                console.error(`Can't continue, No ${room} from socket id ${this.socket}`);
+                return;
+            }
+        }
         let attachedFileId = null;
         if (bytes) {
             attachedFileId = room + "_" + uuidv4().replace(/-/g, '_');

@@ -670,4 +670,32 @@ export class SocketIOCall {
 
         res.send(buffer); // send raw bytes
     }
+
+    static async putAttachedFile(req, res, next) {
+        const response = {
+            status: "ok",
+        };
+        const text = General.readParam(req, "text", null, true);
+        const author = General.readParam(req, "author", null, true);
+        const open = General.readParam(req, "open", null, true) == "1";
+        const room = General.readParam(req, "room", null, true);
+        const socketId = General.readParam(req, "socketId", null, true);
+
+        const file = req.files["file"][0];
+        const buffer = file.buffer;
+        const mimetype = file.mimetype;
+
+        const payload = {
+            text: text,
+            author: author,
+            open: open,
+            bytes: buffer,
+            fileName: text,
+            mimeType: mimetype,
+            room,
+        };
+
+        await new SendChatProcessor(SocketIOCall, SocketIOCall.io, socketId).executeSave(payload);
+        res.status(200).send(response);
+    }
 }
