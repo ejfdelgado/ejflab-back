@@ -665,7 +665,7 @@ export class SocketIOCall {
         res.setHeader("Content-Disposition", `inline; filename=${safeName}`);
         res.setHeader("Content-Type", mimeType);
         res.setHeader("X-Frame-Options", "ALLOWALL");
-        res.setHeader("Content-Security-Policy", "frame-ancestors 'self' http://localhost:4200;");
+        res.setHeader("Content-Security-Policy", "frame-ancestors 'self' http://localhost:4200 https://apps.solvista.me;");
         res.setHeader("Permissions-Policy", "fullscreen=*");
 
         res.send(buffer); // send raw bytes
