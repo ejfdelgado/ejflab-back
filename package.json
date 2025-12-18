@@ -1,6 +1,6 @@
 {
   "name": "@ejfdelgado/ejflab-back",
-  "version": "1.35.5",
+  "version": "1.35.6",
   "type": "module",
   "repository": {
     "type": "git",
@@ -20,7 +20,7 @@
   "license": "ISC",
   "private": false,
   "dependencies": {
-    "@ejfdelgado/ejflab-common": "1.16.7",
+    "@ejfdelgado/ejflab-common": "1.16.9",
     "@google-cloud/compute": "^4.7.0",
     "@google-cloud/firestore": "^7.9.0",
     "@google-cloud/storage": "^7.11.3",
