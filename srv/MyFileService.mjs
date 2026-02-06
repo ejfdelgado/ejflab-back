@@ -7,13 +7,19 @@ import { MyConstants } from "@ejfdelgado/ejflab-common/src/MyConstants.js";
 import { General } from "./common/General.mjs";
 import { PassThrough } from "stream";
 import { Gif } from "@ejfdelgado/ejflab-common/src/gif/index.mjs";
+import { NoAutorizadoException } from "./MyError.mjs";
 
 const storage = new Storage();
 
-const defaultBucket = storage.bucket(MyConstants.BUCKET.PUBLIC);
-const privateBucket = storage.bucket(MyConstants.BUCKET.PRIVATE);
+let defaultBucket = storage.bucket(MyConstants.BUCKET.PUBLIC);
+let privateBucket = storage.bucket(MyConstants.BUCKET.PRIVATE);
 
 export class MyFileService {
+
+    static refreshBucketReference() {
+        defaultBucket = storage.bucket(MyConstants.BUCKET.PUBLIC);
+        privateBucket = storage.bucket(MyConstants.BUCKET.PRIVATE);
+    }
 
     async setFilePublic(bucketRef, fileName) {
         await bucketRef
@@ -217,7 +223,7 @@ export class MyFileService {
     /**
     * @param encoding ascii, utf8 or null
     */
-    static async read(originalUrl, encoding = null) {
+    static async read(originalUrl, encoding = null, user = null) {
         const filePath = decodeURIComponent(originalUrl.replace(/^\//, "").replace(/\?.*$/, ""));
         const fileName = /[^/]+$/.exec(filePath)[0];
         const bucket = privateBucket;
@@ -236,6 +242,20 @@ export class MyFileService {
                     metadata.filename = fileName;
                     metadata.fullPath = originalUrl;
                     const content = respuesta[1];
+
+                    const customMetadata = metadata.metadata;
+                    if (customMetadata) {
+                        const { roles } = customMetadata;
+                        if (roles) {
+                            // It roles, then at least needs authenticated user
+                            if (!user) {
+                                reject(new NoAutorizadoException("Not authorized"));
+                                return;
+                            }
+                            // Here improve security adding role based scheme
+                        }
+                    }
+
                     resolve({
                         metadata: metadata,
                         data: content,
