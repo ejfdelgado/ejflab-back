@@ -49,12 +49,16 @@ function verifyMicrosoftToken(token) {
 }
 
 function getFirebaseConfig() {
-    const firebaseJson = fs.readFileSync(MyConstants.FIREBASE_CONFIG_FILE, { encoding: "utf8" });
+    const path = MyConstants.FIREBASE_CONFIG_FILE;
+    console.log(`Reading ${path}...`);
+    const firebaseJson = fs.readFileSync(path, { encoding: "utf8" });
     return JSON.parse(firebaseJson);
 }
 
 try {
-    initializeApp(getFirebaseConfig());
+    const parsed = getFirebaseConfig();
+    console.log(JSON.stringify(parsed, null, 4));
+    initializeApp(parsed);
 } catch (err) {
     console.log(err);
     console.log("Firebase capability not configured");
