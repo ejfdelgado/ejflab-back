@@ -12,9 +12,23 @@ const AUTH_PROVIDER = process.env.AUTH_PROVIDER;
 const MICROSOFT_CLIENT_ID = process.env.MICROSOFT_CLIENT_ID;
 const MICROSOFT_TENANT = process.env.MICROSOFT_TENANT;
 
-const microsoftClient = jwksClient({
+const MICROSOFT_CONFIG = {
     jwksUri: `https://login.microsoftonline.com/${MICROSOFT_TENANT}/discovery/v2.0/keys`,
-});
+};
+
+if (process.env.MICROSOFT_USE_TIMEOUT == "1") {
+    Object.assign(
+        MICROSOFT_CONFIG,
+        {
+            timeout: 10000,          // fail fast instead of hanging
+            cache: true,
+            cacheMaxEntries: 5,
+            cacheMaxAge: 3600000,    // 1 hour cache
+        }
+    )
+}
+
+const microsoftClient = jwksClient(MICROSOFT_CONFIG);
 
 // Helper to get the signing key
 function getMicrosoftKey(header, callback) {
