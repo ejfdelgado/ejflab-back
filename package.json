@@ -10,7 +10,7 @@
   "scripts": {
     "bip": "ffplay /sound/finish.mp3 -nodisp -nostats -hide_banner -autoexit",
     "mylogin": "npm login",
-    "mypublish": "npm install && npm publish --access=public && npm run bip",
+    "mypublish": "PUPPETEER_SKIP_DOWNLOAD=true npm install && npm publish --access=public && npm run bip",
     "clean": "rm -rf node_modules && npm cache clean --force && rm package-lock.json && npm install"
   },
   "engines": {
