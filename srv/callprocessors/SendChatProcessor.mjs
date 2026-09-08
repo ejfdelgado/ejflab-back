@@ -8,7 +8,7 @@ export class SendChatProcessor extends GenericProcessor {
         super(context, io, socket);
     }
     execute(args) {
-        const { text, author, open, bytes, fileName, mimeType } = args;
+        const { text, author, open, bytes, fileName, mimeType, system } = args;
         let room = this.context.getRoomFromSocket(this.socket);
         if (!room) {
             if (args.room) {
@@ -38,6 +38,7 @@ export class SendChatProcessor extends GenericProcessor {
             author: {
                 uid: author,
             },
+            system: !!system,
         };
         if (attachedFileId) {
             chatEntry.attachedId = attachedFileId;
