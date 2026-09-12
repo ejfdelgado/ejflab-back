@@ -215,9 +215,9 @@ export class SocketIOCall {
             SocketIOCall.socketRoomUUIDMap[room][myUUID] = socket.id;
         }
         // Here creates the uuid mapping
-        console.log(JSON.stringify(SocketIOCall.socketRoomUUIDMap, null, 4));
+        //console.log(JSON.stringify(SocketIOCall.socketRoomUUIDMap, null, 4));
         release();
-        console.log(`${socket.id} joins ${headers.room}`);
+        //console.log(`${socket.id} joins ${headers.room}`);
         socket.join(headers.room);
         SocketIOCall.getRoomLiveTupleModel(room);
     }
@@ -253,7 +253,7 @@ export class SocketIOCall {
             if (Object.keys(SocketIOCall.socketRoomUUIDMap[room]).length == 0) {
                 delete SocketIOCall.socketRoomUUIDMap[room];
             }
-            console.log(JSON.stringify(SocketIOCall.socketRoomUUIDMap, null, 4));
+            //console.log(JSON.stringify(SocketIOCall.socketRoomUUIDMap, null, 4));
         }
         release();
     }
