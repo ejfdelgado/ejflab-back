@@ -67,7 +67,7 @@ export class MyPdf {
         }
         if (!launch) {
             launch = {
-                headless: 'new',
+                headless: true,
                 executablePath: executablePath,
                 args: [
                     "--no-sandbox",
