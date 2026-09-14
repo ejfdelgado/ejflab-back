@@ -27,9 +27,6 @@ import { UpdateMyInformationProcessor } from "./callprocessors/UpdateMyInformati
 import axios from "axios";
 import { encode, decode } from "@msgpack/msgpack";
 import { ChatSetSawProcessor } from "./callprocessors/ChatSetSawProcessor.mjs";
-import { MilvusSrv } from "./MilvusSrv.mjs";
-import { MongoSrv } from "./MongoSrv.mjs";
-import { MinioSrv } from "./MinioSrv.mjs";
 import { PostgresSrv } from "./PostgresSrv.mjs";
 import { OpenVideoChatProcessor } from "./callprocessors/OpenVideoChatProcessor.mjs";
 import { CloseVideoChatProcessor } from "./callprocessors/CloseVideoChatProcessor.mjs";
@@ -113,18 +110,6 @@ export class SocketIOCall {
 
     static getAxios() {
         return axios;
-    }
-
-    static getMilvusClient() {
-        return MilvusSrv;
-    }
-
-    static getMongoClient() {
-        return MongoSrv;
-    }
-
-    static getMinioClient() {
-        return MinioSrv;
     }
 
     static getPostgresClient() {
